@@ -1,0 +1,28 @@
+
+
+
+suppressMessages(library("phyloseq",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("ggplot2",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("RColorBrewer",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("patchwork",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("vegan",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("tidyverse",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("readr",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("dyplr",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
+
+
+# Import biom file to a phyloseq object
+
+metagenome <- import_biom(snakemake@input[["biom_file"]])
+metadata <- read.csv(snakemake@input[["metadata"]],sep='\t')
+metagenome@sam_data <- sample_data(metadata)
+
+# Change taxon names
+colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+
+# Remove taxa which is not present in one sample at least
+metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
+
+#Save phyloseq object
+save(metagenome, snakemake@output)

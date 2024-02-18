@@ -1,0 +1,68 @@
+input_dir: "wgs_vaginal_swab"
+out_dir: "test1_kraken_results"
+mode: "ont"
+threads: 4
+
+
+kraken_options:
+  db: "db_shotgun"
+  threads: 8
+  confidence: 0.1
+
+bracken_options:
+  run_bracken: True
+  read_length:
+  threshold: 10
+  level: "S"
+
+kraken_build_options:
+  run_build: FALSE
+  special:
+
+
+
+centrifuge_build_options:
+ # custom-db: "path/to/custom_db"
+#  threads:
+#  reference_name:
+
+centrifuge_options:
+
+quality:
+  perform: True
+  threshold: 2
+  head_crop:
+  tail_crop:
+  min_length: 800
+  max_length: 1900
+
+run_align: True
+host_reference: "./human_genome_reference/GCA_000001405.15_GRCh38_genomic.fna"
+
+minimap2_options:
+   threads: 8
+
+filter_bracken:
+   to_: "include" # in ["include", "exclude"]
+   list:        # List of tax ids to include or exclude
+
+alpha_diversity:
+  measures: ["Observed", "Chao1", "Shannon", "Simpson"] # Can select only the wanted measures
+  title: "Alpha Diversity"
+  color:
+  shape:
+
+beta_diversity:
+  method:           # in ["DCA", "CCA", "RDA", "CAP", DPCoA", "NMDS", "PCoA"]
+  distance:       # in ["bray", ..]
+  color:
+  shape:
+  title: # "Beta Diversity"
+  type: "taxa"            # in ["taxa", "samples", "biplot", "split"]
+  wrap:               # Group samples by categorical factor in the metadata table. Only one categorical factor possible.
+
+taxonomic_barplots:
+  groups:               # Group samples by categorical factor in the metadata table. Can be a list of different groupments ==> pdf file
+  tax_ranks:            # List of tax levels on which to do the analysis (One pdf file per tax level)
+  abundance: "relative"   # in ["absolut", "relative"]
+  abundance_threshold:  0 # in percentage if relative and in counts if absolut !

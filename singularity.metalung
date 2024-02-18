@@ -1,0 +1,25 @@
+BootStrap: docker
+From: continuumio/miniconda3
+
+%setup
+    mkdir -p {SINGULARITY_ROOTFS}/users
+
+%environment
+    PATH="/opt/conda/bin:$PATH"
+
+%post
+    ln -s /bin/tar /bin/gtar
+    export PATH=/opt/conda/bin:$PATH
+    echo "./opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
+
+    apt-get install -y libcurl3-dev gcc zlib1g-dev
+    conda install -y -c conda-forge -c r -c bioconda r r-devtools r-ggplot2 r-ggpubr r-rcolorbrewer r-patchwork r-vegan r-plyr r-ALDEx2 r-cmapR
+
+
+    # install some other packages
+
+
+
+
+%runscript
+    exec /bin/bash
