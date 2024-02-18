@@ -20,13 +20,14 @@ import time
 configfile: "config.yaml"
 in_dir=config["input_dir"]
 SAMPLES=glob_wildcards(in_dir+"/{sample}.fastq")
+classifier=config["classifier"]
 print(SAMPLES)
 
 rule all:
     input:
-         expand(config["out_dir"]+"/classification/{sample}.kraken.report",sample=SAMPLES.sample),
-         expand(config["out_dir"]+"/classification/{sample}.kraken",sample=SAMPLES.sample),
-         expand(config["out_dir"]+"/classification/{sample}.kraken_bracken_species.report",sample=SAMPLES.sample) if config["bracken_options"]["run_bracken"] else "run.txt",
+         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.report",sample=SAMPLES.sample,classifier=classifier),
+         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
+         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken_bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
          expand("/filtered_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["quality"]["perform"] else "run.txt",
          expand("/aligned_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["run_align"] else "run.txt"
 
@@ -125,7 +126,7 @@ rule index_kraken:
 
 
 
-# Rule: Kraken2 classification
+# Rule: Kraken2 classification_{classifier}
 rule kraken2:
     input:
         fastq=in_dir+"/{sample}.fastq",
@@ -134,8 +135,8 @@ rule kraken2:
         opts=config["kraken_options"].get("db","kraken_dbs")+"/opts.k2d",
         taxo=config["kraken_options"].get("db","kraken_dbs")+"/taxo.k2d"
     output:
-        krak = join(config["out_dir"], "classification/{sample}.kraken"),
-        krak_report = join(config["out_dir"], "classification/{sample}.kraken.report")
+        krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken"),
+        krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kraken.report")
     resources:
         time=6
     shell:
@@ -145,47 +146,47 @@ rule kraken2:
 
 rule bracken:
     input:
-     krak_report = join(config["out_dir"], "classification/{sample}.kraken.report"),
-     krak = join(config["out_dir"], "classification/{sample}.kraken")
+     krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kraken.report"),
+     krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken")
     output:
-     join(config["out_dir"], "classification/{sample}.bracken_{level}.report")
+     join(config["out_dir"], "classification_{classifier}/{sample}.bracken_{level}.report")
     params:
      kraken_db = config["kraken_options"].get("db", "kraken_dbs"),
      readlen = config["bracken_options"]["read_length"],
      threshold = config["bracken_options"].get("threshold",10),
      level = config["bracken_options"].get("taxonomic_level","S"),
-     out = join(config["out_dir"],"classification/{sample}.kraken.report.bracken")
+     out = join(config["out_dir"],"classification_{classifier}/{sample}.kraken.report.bracken")
     shell: """
        bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -l {params.level} -t {params.threshold} -l {params.readlen}
     """
 
 
 
-#rule index_centrifuge_db:
-#  output:
-#       directory("{custom_db}/")
-#  input:
-#      conv=config["centrifuge_build_options"]["custom-db"]+"/seqid2taxid.map",
-#      tree=config["centrifuge_build_options"]["custom-db"]+"/taxonomy/nodes.dmp",
-#      name_table=config["centrifuge_build_options"]["custom-db"]+"/taxonomy/names.dmp",
-#      fa_path=config["centrifuge_build_options"]["custom-db"]+"library/
-#  params:
-#      threads=config["centrifuge_build_options"].get("threads","1"),
-#      reference_name=config["centrifuge_build_options"].get("reference_name","ex")
-#  shell:
-#      """
-#      cat {input.fa_path}/*/*.fna |
-#      centrifuge-build -p {params.threads} --conversion-table {input[conv]} \
-#                       --taxonomy-tree {input[tree]} --name-table {input[name_table]} \
-#                        {params[reference_name]}
-#      """
+rule index_centrifuge_db:
+  output:
+       directory("{custom_db}/")
+  input:
+      conv=config["centrifuge_build_options"]["custom-db"]+"/seqid2taxid.map",
+      tree=config["centrifuge_build_options"]["custom-db"]+"/taxonomy/nodes.dmp",
+      name_table=config["centrifuge_build_options"]["custom-db"]+"/taxonomy/names.dmp",
+      fa_path=config["centrifuge_build_options"]["custom-db"]+"/library/"
+  params:
+      threads=config["centrifuge_build_options"].get("threads","1"),
+      reference_name=config["centrifuge_build_options"].get("reference_name","ex")
+  shell:
+      """
+      cat {input.fa_path}/*/*.fna |
+      centrifuge-build -p {params.threads} --conversion-table {input[conv]} \
+                       --taxonomy-tree {input[tree]} --name-table {input[name_table]} \
+                        {params[reference_name]}
+      """
 
 #Downstream analysis with R
 rule combine_kreport:
     input:
-        expand(config["out_dir"]+"/classification/{sample}.kraken.report",sample=SAMPLES.sample)
+        expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.report",sample=SAMPLES.sample,classifier=classifier)
     output:
-        config["out_dir"]+"/classification/combined.kraken.report"
+        config["out_dir"]+f"/classification_{classifier}/combined.kraken.report"
     shell:
         """
         python combine_kreports.py -r {input} -o {output} --display-headers
@@ -193,7 +194,7 @@ rule combine_kreport:
 
 rule kreport2krona:
     input:
-        config["out_dir"]+"/classification/{sample}.kraken.report"
+        config["out_dir"]+f"/classification_{classifier}"+"/{sample}.kraken.report"
     output:
         join(config["out_dir"],"krona_results/{sample}.krona")
     shell:
@@ -203,7 +204,7 @@ rule kreport2krona:
 
 rule filter_bracken:
     input:
-        join(config["out_dir"], "classification/{sample}.kraken_bracken_{level}.report")
+        join(config["out_dir"], f"classification_{classifier}","/{sample}.kraken_bracken_{level}.report")
     output:
         join(config["out_dir"],"filtered_bracken/{sample}.kraken_bracken_{level}.report")
     params:
@@ -216,7 +217,7 @@ rule filter_bracken:
 
 rule make_biom:
     input:
-        expand(config["out_dir"]+"classification/{sample}.{type}.report",sample=SAMPLES.sample)
+        expand(config["out_dir"]+f"classification_{classifier}","/{sample}.{type}.report",sample=SAMPLES.sample, classifier=classifier)
     output:
         join(config["out_dir"],"analysis/{type}_table.biom")
     shell:
@@ -235,7 +236,7 @@ rule make_phyloseq:
 
 rule alpha_diversity:
     input:
-        phylo_obj=join(config["out_dir"],"classification/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"], "analysis/alpha_diversity_{type}.png")
     params:
@@ -248,7 +249,7 @@ rule alpha_diversity:
 
 rule beta_diversity:
     input:
-        phylo_obj=join(config["out_dir"],"classification/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"], "analysis/beta_diversity_{type}.png")
     params:
@@ -266,7 +267,7 @@ rule beta_diversity:
 
 rule taxonomic_barplots:
     input:
-        phylo_obj=join(config["out_dir"],"classification/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"],"analysis/taxonomic_barplots_{type}.pdf")
     params:
@@ -281,7 +282,7 @@ rule taxonomic_barplots:
 
 rule abund_heatmap:
     input:
-        phylo_obj=join(config["out_dir"], "classification/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"], f"classification_{classifier}","/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"],"analysis/abund_heatmap_{type}.png")
     params:
