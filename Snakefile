@@ -278,3 +278,19 @@ rule taxonomic_barplots:
     singularity: "shub://Zagh05/MetaLung:metalung"
     script:
         'scripts/taxonomic_barplots.R'
+
+rule abund_heatmap:
+    input:
+        phylo_obj=join(config["out_dir"], "classification/phyloseq_{type}.Rdata")
+    output:
+        join(config["out_dir"],"analysis/abund_heatmap_{type}.png")
+    params:
+        subset  =   config["abund_heatmap"]["subset"],
+        method =   config["abund_heatmap"]["method"],
+        distance =   config["abund_heatmap"]["distance"],
+        sample_label =  config["abund_heatmap"]["sample_label"],
+        taxa_label =   config["abund_heatmap"]["taxa_label"],
+        wrap =   config["abund_heatmap"].get("wrap",0)
+    singularity: "shub://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/abund_heatmap.R'

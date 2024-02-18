@@ -1,4 +1,0 @@
-16s_greengenes="https://genome-idx.s3.amazonaws.com/kraken/16S_Greengenes13.5_20200326.tgz"
-16s_rdp="https://genome-idx.s3.amazonaws.com/kraken/16S_RDP11.5_20200326.tgz"
-16s_silva="https://genome-idx.s3.amazonaws.com/kraken/16S_Silva132_20200326.tgz"
-

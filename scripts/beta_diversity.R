@@ -30,12 +30,13 @@ bacteria_meta_perc.ord <- ordinate(physeq = bacteria_percentages, method = metho
 
 png("")
 
-if (wrap){
-    plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape) +
-        facet_wrap(~wrap,scales="free_x")
+if !(wrap){
+    plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape)
+
 }
 else {
-    plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape)
+    plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape) +
+            facet_wrap(~wrap,scales="free_x")
 }
 
 
