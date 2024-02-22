@@ -22,11 +22,11 @@ kraken_build_options:
 
 
 centrifuge_build_options:
- # custom-db: "path/to/custom_db"
-#  threads:
-#  reference_name:
+  centrifuge_db: "path/to/custom_db"
+  reference_name: "ev"
 
 centrifuge_options:
+  threads:
 
 quality:
   perform: True

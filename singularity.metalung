@@ -18,6 +18,15 @@ From: continuumio/miniconda3
 
     # install some other packages
 
+    Rscript -e 'install.packages("BiocManager", repos = "http://cran.us.r-project.org")'
+
+
+    # aldex2 and dependencies
+    Rscript -e 'BiocManager::install("GenomicRanges")'
+    Rscript -e 'BiocManager::install("BiocParallel")'
+    Rscript -e 'BiocManager::install("ALDEx2")'
+
+
 
 
 

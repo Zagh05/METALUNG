@@ -126,6 +126,29 @@ rule index_kraken:
 
 
 
+rule index_centrifuge_db:
+    output:
+        ex1 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".1.cf"),
+        ex2 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".2.cf"),
+        ex3 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".3.cf")
+
+    input:
+        conv=config["centrifuge_build_options"]["centrifuge_db"]+"/seqid2taxid.map",
+        tree=config["centrifuge_build_options"]["centrifuge_db"]+"/taxonomy/nodes.dmp",
+        name_table=config["centrifuge_build_options"]["centrifuge_db"]+"/taxonomy/names.dmp",
+        fa_path=config["centrifuge_build_options"]["centrifuge_db"]+"/library/"
+    params:
+        threads=config["centrifuge_build_options"].get("threads","1"),
+        reference_name=config["centrifuge_build_options"].get("reference_name","ex")
+    shell:
+        """
+        cat {input.fa_path}/*/*.fna |
+        centrifuge-build -p {params.threads} --conversion-table {input[conv]} \
+                         --taxonomy-tree {input[tree]} --name-table {input[name_table]} \
+                          {params[reference_name]}
+        """
+
+
 # Rule: Kraken2 classification_{classifier}
 rule kraken2:
     input:
@@ -135,14 +158,30 @@ rule kraken2:
         opts=config["kraken_options"].get("db","kraken_dbs")+"/opts.k2d",
         taxo=config["kraken_options"].get("db","kraken_dbs")+"/taxo.k2d"
     output:
-        krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken"),
-        krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kraken.report")
-    resources:
-        time=6
+        krak = join(config["out_dir"], "classification_kraken/{sample}.kraken"),
+        krak_report = join(config["out_dir"], "classification_kraken/{sample}.kraken.report")
     shell:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names
         """
+rule centrifuge:
+    input:
+        fastq=in_dir+"/{sample}.fastq",
+        centrifuge_db=join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]),
+        ex1 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".1.cf"),
+        ex2 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".2.cf"),
+        ex3 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".3.cf"),
+    output:
+        report_file=join(config["out_dir"], "classification_centrifuge/{sample}.report"),
+        stdout=join(config["out_dir"], "classification_centrifuge/{sample}.centrifuge"),
+        kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kraken.report")
+    params:
+        threads=config["centrifuge_options"].get("threads",1),
+    shell:"""
+    centrifuge -x {input.centrifuge_db} -S {output.stdout} --report-file {output.report_file} -f {input.fastq} 
+    centrifuge-kreport -x {input.centrifuge_db} {output.report_file}  > {output.kraken_report}
+
+    """
 
 rule bracken:
     input:
@@ -162,24 +201,9 @@ rule bracken:
 
 
 
-rule index_centrifuge_db:
-  output:
-       directory("{custom_db}/")
-  input:
-      conv=config["centrifuge_build_options"]["custom-db"]+"/seqid2taxid.map",
-      tree=config["centrifuge_build_options"]["custom-db"]+"/taxonomy/nodes.dmp",
-      name_table=config["centrifuge_build_options"]["custom-db"]+"/taxonomy/names.dmp",
-      fa_path=config["centrifuge_build_options"]["custom-db"]+"/library/"
-  params:
-      threads=config["centrifuge_build_options"].get("threads","1"),
-      reference_name=config["centrifuge_build_options"].get("reference_name","ex")
-  shell:
-      """
-      cat {input.fa_path}/*/*.fna |
-      centrifuge-build -p {params.threads} --conversion-table {input[conv]} \
-                       --taxonomy-tree {input[tree]} --name-table {input[name_table]} \
-                        {params[reference_name]}
-      """
+
+
+
 
 #Downstream analysis with R
 rule combine_kreport:
