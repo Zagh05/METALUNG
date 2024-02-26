@@ -33,17 +33,27 @@ if [ "$method" == "target" ]; then
 
   if [ "$references" == "greengenes" ]; then
       link=${16s_greengenes}
+      wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
   elif [ "$references" == "silva" ]; then
       link=${16s_silva}
+      wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
   elif [ "$references" == "rdp" ]; then
       link=${16s_rdp}
-  elso
+      wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
+  else
     echo "Invalid reference argument. Please specify either 'greengenes' or 'rdp' or silva"
     exit 1
-fi
+  fi
+elif [ "$method" == "shotgun" ]; then
+  kraken2-build --download-taxnomy --db ${output_dir}
+  kraken2-build --download-library ${references} --db ${output_dir}
+  kraken2-build --build --db ${output_dir}
+else
+  echo "invalid method argument. Please specify either 'target' or 'shotgun'"
+  exit 1
 fi
 
-# Download the database using the specified link
 
-wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
+
+
 

@@ -1,5 +1,6 @@
 input_dir: "wgs_vaginal_swab"
 out_dir: "test1_kraken_results"
+classifier: "kraken2" # in ["kraken2", "centrifuge"]
 mode: "ont"
 threads: 4
 
@@ -16,8 +17,12 @@ bracken_options:
   level: "S"
 
 kraken_build_options:
-  run_build: FALSE
-  special:
+  # The output of kraken2-build will be directed to --db in kraken_options
+  run_build: FALSE #TRUE or FALSE
+  add_genome:         # Path to .fa file of host genome if different from human. Make sure run_build is set to FALSE
+  method: "target"
+  references:                   # in ["greengenes", "rdp", "silva"] if method=="target" ; list in ["archaea", "bacteria", "plasmid", "viral", "fungi", "human"]
+
 
 
 

@@ -92,10 +92,15 @@ rule download_kraken_database:
         opts=join(config["kraken_options"].get("db","kraken_dbs"),"opts.k2d"),
         taxo=join(config["kraken_options"].get("db","kraken_dbs"),"taxo.k2d")
     params:
-        db_root=config["kraken_build_options"]
+        db_root=config["kraken_build_options"],
+
+        add_genome=config["kraken_build_options"].get("add_genome",0),
+        method=config["kraken_build_options"]["method"],
+        references=config["kraken_build_options"]["references"]
+    singularity: "docker://aangeloo/kraken2"
     shell:
         """
-        bash ./scripts/download_kraken2_db.sh
+        bash ./scripts/download_kraken2_db.sh --method {params.db_root} --references {params.references} --output_dir {params.db_root}
         """
 
 
@@ -104,25 +109,25 @@ rule download_kraken_database:
 
 
 # Rule: Index reference for Kraken2
-rule index_kraken:
-    output:
-        hash="{kraken_db}/hash.k2d",
-        opts= "{kraken_db}/opts.k2d",
-        taxo="{kraken_db}/taxo.k2d"
-
-    params:
-        db_path=config["kraken_options"].get("db", "kraken_dbs"),
-        collection=config["kraken_build_options"]["collection"]
-    shell:
-        """
-            list=("greengenes" "silva" "rdp")
-            if [[ " {list[@]} " =~ " {params.collection} " ]]; then
-                kraken-build --special {params.collection} --db {params.db_path}
-            else
-                kraken-build --download-library {params.collection} --db {params.db_path}
-            fi
-        
-        """
+#rule index_kraken:
+#    output:
+#        hash="{kraken_db}/hash.k2d",
+#        opts= "{kraken_db}/opts.k2d",
+#        taxo="{kraken_db}/taxo.k2d"
+#
+#    params:
+#        db_path=config["kraken_options"].get("db", "kraken_dbs"),
+#        collection=config["kraken_build_options"]["collection"]
+#    shell:
+#        """
+#            list=("greengenes" "silva" "rdp")
+#            if [[ " {list[@]} " =~ " {params.collection} " ]]; then
+#                kraken-build --special {params.collection} --db {params.db_path}
+#            else
+#                kraken-build --download-library {params.collection} --db {params.db_path}
+#            fi
+#
+#        """
 
 
 
@@ -140,6 +145,7 @@ rule index_centrifuge_db:
     params:
         threads=config["centrifuge_build_options"].get("threads","1"),
         reference_name=config["centrifuge_build_options"].get("reference_name","ex")
+    singularity: "docker://biocontainers/centrifuge"
     shell:
         """
         cat {input.fa_path}/*/*.fna |
@@ -160,6 +166,7 @@ rule kraken2:
     output:
         krak = join(config["out_dir"], "classification_kraken/{sample}.kraken"),
         krak_report = join(config["out_dir"], "classification_kraken/{sample}.kraken.report")
+    singularity: "docker://aangeloo/kraken2"
     shell:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names
@@ -176,7 +183,8 @@ rule centrifuge:
         stdout=join(config["out_dir"], "classification_centrifuge/{sample}.centrifuge"),
         kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kraken.report")
     params:
-        threads=config["centrifuge_options"].get("threads",1),
+        threads=config["centrifuge_options"].get("threads",1)
+    singularity: "docker://biocontainers/centrifuge"
     shell:"""
     centrifuge -x {input.centrifuge_db} -S {output.stdout} --report-file {output.report_file} -f {input.fastq} 
     centrifuge-kreport -x {input.centrifuge_db} {output.report_file}  > {output.kraken_report}
@@ -195,6 +203,7 @@ rule bracken:
      threshold = config["bracken_options"].get("threshold",10),
      level = config["bracken_options"].get("taxonomic_level","S"),
      out = join(config["out_dir"],"classification_{classifier}/{sample}.kraken.report.bracken")
+    singularity: "docker://aangeloo/kraken2"
     shell: """
        bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -l {params.level} -t {params.threshold} -l {params.readlen}
     """
