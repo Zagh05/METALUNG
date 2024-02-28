@@ -197,7 +197,7 @@ rule bracken:
      krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kraken.report"),
      krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken")
     output:
-     join(config["out_dir"], "classification_{classifier}/{sample}.bracken_{level}.report")
+     join(config["out_dir"], "classification_{classifier}/{sample}.kraken.bracken_{level}.report")
     params:
      kraken_db = config["kraken_options"].get("db", "kraken_dbs"),
      readlen = config["bracken_options"]["read_length"],
