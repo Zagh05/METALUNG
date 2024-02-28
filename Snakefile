@@ -202,10 +202,10 @@ rule bracken:
      readlen = config["bracken_options"]["read_length"],
      threshold = config["bracken_options"].get("threshold",10),
      level = config["bracken_options"].get("taxonomic_level","S"),
-     out = join(config["out_dir"],"classification_{classifier}/{sample}.kraken.report.bracken")
+     out = join(config["out_dir"],"classification_{classifier}/{sample}.bracken.report")
     singularity: "docker://aangeloo/kraken2"
     shell: """
-       bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -l {params.level} -t {params.threshold} -l {params.readlen}
+       bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -w {output} -l {params.level} -t {params.threshold} -l {params.readlen}
     """
 
 
@@ -237,9 +237,9 @@ rule kreport2krona:
 
 rule filter_bracken:
     input:
-        join(config["out_dir"], f"classification_{classifier}","/{sample}.kraken_bracken_{level}.report")
+        join(config["out_dir"], f"classification_{classifier}","/{sample}.bracken_{level}.report")
     output:
-        join(config["out_dir"],"filtered_bracken/{sample}.kraken_bracken_{level}.report")
+        join(config["out_dir"],"filtered_bracken/{sample}.bracken_{level}.report")
     params:
         to_=config["filter_bracken"]["filter"],
         list=config["filter_bracken"]["exclude"]
