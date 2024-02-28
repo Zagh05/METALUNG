@@ -263,7 +263,7 @@ rule make_phyloseq:
        biom_file=join(config["out_dir"],"analysis/{type}_table.biom")
     output:
         join(config["out_dir"],"analysis/phyloseq_{type}.Rdata")
-    singularity: "shub://Zagh05/MetaLung:metalung"
+    singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/make_phyloseq.R'
 
@@ -276,7 +276,7 @@ rule alpha_diversity:
         measures = config["alpha_diversity"]["measures"],
         title = config["alpha_diversity"]["title"],
         color = config["alpha_diversity"]["color"]
-    singularity: "shub://Zagh05/MetaLung:metalung"
+    singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/alpha_diversity.R'
 
@@ -293,7 +293,7 @@ rule beta_diversity:
         type = config["beta_diversity"]["type"],
         wrap = config["beta_diversity"].get("wrap","NA")
 
-    singularity: "shub://Zagh05/MetaLung:metalung"
+    singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/beta_diversity.R'
 
@@ -309,7 +309,7 @@ rule taxonomic_barplots:
         tax_ranks = config["taxonomic_barplots"]["tax_ranks"],
         abundance = config["taxonomic_barplots"]["abundance"],
         abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"]
-    singularity: "shub://Zagh05/MetaLung:metalung"
+    singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/taxonomic_barplots.R'
 
@@ -325,6 +325,20 @@ rule abund_heatmap:
         sample_label =  config["abund_heatmap"]["sample_label"],
         taxa_label =   config["abund_heatmap"]["taxa_label"],
         wrap =   config["abund_heatmap"].get("wrap",0)
-    singularity: "shub://Zagh05/MetaLung:metalung"
+    singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/abund_heatmap.R'
+
+rule differential_abundance:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
+    output:
+        join(config["out_dir"],"analysis/differential_abundance","compositional_PCA_plot_{type}.pdf")
+
+    params:
+        subset = config["diff_abund"].get("subset",0),
+        group = config["diff_abund"]["group"],
+        output_dir = join(config["out_dir"],"differential_abundance")
+    singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/differential_abundance.R'
