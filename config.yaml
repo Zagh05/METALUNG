@@ -72,3 +72,7 @@ taxonomic_barplots:
   tax_ranks:            # List of tax levels on which to do the analysis (One pdf file per tax level)
   abundance: "relative"   # in ["absolut", "relative"]
   abundance_threshold:  0 # in percentage if relative and in counts if absolut !
+
+diff_abund:
+  subset:
+  group:
