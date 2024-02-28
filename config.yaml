@@ -16,6 +16,7 @@ bracken_options:
   threshold: 10
   level: "S"
 
+
 kraken_build_options:
   # The output of kraken2-build will be directed to --db in kraken_options
   run_build: FALSE #TRUE or FALSE
@@ -48,8 +49,8 @@ minimap2_options:
    threads: 8
 
 filter_bracken:
-   to_: "include" # in ["include", "exclude"]
-   list:        # List of tax ids to include or exclude
+   filter: "include" # in ["include", "exclude"]
+   exclude:        # List of tax ids to include or exclude
 
 alpha_diversity:
   measures: ["Observed", "Chao1", "Shannon", "Simpson"] # Can select only the wanted measures
