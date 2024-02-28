@@ -28,9 +28,9 @@ rule all:
     input:
          expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.report",sample=SAMPLES.sample,classifier=classifier),
          expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
-         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken_bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
-         expand("/filtered_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["quality"]["perform"] else "run.txt",
-         expand("/aligned_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["run_align"] else "run.txt"
+         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
+         #expand("/filtered_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["quality"]["perform"] else "run.txt",
+         #expand("/aligned_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["run_align"] else "run.txt"
 
 # Rule: Generate MultiQC report
 rule multiqc:
