@@ -77,3 +77,11 @@ taxonomic_barplots:
 diff_abund:
   subset:
   group:
+
+abund_heatmap:
+  subset:
+  method:
+  distance:
+  sample_label:
+  taxa_label:
+  wrap:
