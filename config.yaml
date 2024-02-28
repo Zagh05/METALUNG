@@ -68,6 +68,7 @@ beta_diversity:
   wrap:               # Group samples by categorical factor in the metadata table. Only one categorical factor possible.
 
 taxonomic_barplots:
+  title:
   groups:               # Group samples by categorical factor in the metadata table. Can be a list of different groupments ==> pdf file
   tax_ranks:            # List of tax levels on which to do the analysis (One pdf file per tax level)
   abundance: "relative"   # in ["absolut", "relative"]
