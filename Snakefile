@@ -22,6 +22,7 @@ in_dir=config["input_dir"]
 SAMPLES=glob_wildcards(in_dir+"/{sample}.fastq")
 classifier=config["classifier"]
 print(SAMPLES)
+type="kraken"
 
 rule all:
     input:
@@ -248,10 +249,11 @@ rule filter_bracken:
         """
 
 rule make_biom:
-    input:
-        expand(config["out_dir"]+f"classification_{classifier}"+"/{sample}.{wildcards.type}.report",sample=SAMPLES.sample, classifier=classifier)
     output:
-        join(config["out_dir"],"analysis/{type}_table.biom")
+        join(config["out_dir"],f"analysis/{type}_table.biom")
+    input:
+        expand(config["out_dir"]+f"classification_{classifier}"+"/{sample}."+f"{type}.report",sample=SAMPLES.sample, classifier=classifier)
+
     shell:
         """
         kraken-biom {input} -o {output}
