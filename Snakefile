@@ -213,7 +213,6 @@ rule bracken:
 
 
 
-
 #Downstream analysis with R
 rule combine_kreport:
     input:
@@ -250,7 +249,7 @@ rule filter_bracken:
 
 rule make_biom:
     input:
-        expand(config["out_dir"]+f"classification_{classifier}","/{sample}.{type}.report",sample=SAMPLES.sample, classifier=classifier)
+        expand(config["out_dir"]+f"classification_{classifier}"+"/{sample}.{wildcards.type}.report",sample=SAMPLES.sample, classifier=classifier)
     output:
         join(config["out_dir"],"analysis/{type}_table.biom")
     shell:
@@ -269,7 +268,7 @@ rule make_phyloseq:
 
 rule alpha_diversity:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"], "analysis/alpha_diversity_{type}.png")
     params:
@@ -282,7 +281,7 @@ rule alpha_diversity:
 
 rule beta_diversity:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"], "analysis/beta_diversity_{type}.png")
     params:
@@ -300,7 +299,7 @@ rule beta_diversity:
 
 rule taxonomic_barplots:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"],"analysis/taxonomic_barplots_{type}.pdf")
     params:
@@ -315,7 +314,7 @@ rule taxonomic_barplots:
 
 rule abund_heatmap:
     input:
-        phylo_obj=join(config["out_dir"], f"classification_{classifier}","/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"], f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
     output:
         join(config["out_dir"],"analysis/abund_heatmap_{type}.png")
     params:
@@ -331,9 +330,9 @@ rule abund_heatmap:
 
 rule differential_abundance:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}","/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
     output:
-        join(config["out_dir"],"analysis/differential_abundance","compositional_PCA_plot_{type}.pdf")
+        join(config["out_dir"],"analysis/differential_abundance/"+"compositional_PCA_plot_{type}.pdf")
 
     params:
         subset = config["diff_abund"].get("subset",0),
