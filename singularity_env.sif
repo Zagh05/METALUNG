@@ -5,7 +5,7 @@ From: continuumio/miniconda3
     authors Bayram Boukhari
 
 %environment
-    PATH /Bracken:$PATH
+    PATH=/Bracken:$PATH
 
 %post
     apt-get update --fix-missing
