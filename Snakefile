@@ -98,7 +98,7 @@ rule download_kraken_database:
         add_genome=config["kraken_build_options"].get("add_genome",0),
         method=config["kraken_build_options"]["method"],
         references=config["kraken_build_options"]["references"]
-    singularity: "docker://aangeloo/kraken2"
+    container: "Dockerfile"
     shell:
         """
         bash ./scripts/download_kraken2_db.sh --method {params.db_root} --references {params.references} --output_dir {params.db_root}
@@ -146,7 +146,7 @@ rule index_centrifuge_db:
     params:
         threads=config["centrifuge_build_options"].get("threads","1"),
         reference_name=config["centrifuge_build_options"].get("reference_name","ex")
-    singularity: "docker://biocontainers/centrifuge"
+    container: "Dockerfile"
     shell:
         """
         cat {input.fa_path}/*/*.fna |
@@ -167,7 +167,7 @@ rule kraken2:
     output:
         krak = join(config["out_dir"], "classification_kraken2/{sample}.kraken"),
         krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kraken.report")
-    singularity: "Dockerfile"
+    container: "Dockerfile"
     shell:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names
@@ -185,7 +185,7 @@ rule centrifuge:
         kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kraken.report")
     params:
         threads=config["centrifuge_options"].get("threads",1)
-    singularity: "docker://biocontainers/centrifuge"
+    container: "Dockerfile"
     shell:"""
     centrifuge -x {input.centrifuge_db} -S {output.stdout} --report-file {output.report_file} -f {input.fastq} 
     centrifuge-kreport -x {input.centrifuge_db} {output.report_file}  > {output.kraken_report}
@@ -204,7 +204,7 @@ rule bracken:
      threshold = config["bracken_options"].get("threshold",10),
      level = config["bracken_options"].get("taxonomic_level","S"),
      out = join(config["out_dir"],"classification_{classifier}/{sample}.bracken.report")
-    singularity: "docker://aangeloo/kraken2"
+    container: "Dockerfile"
     shell: """
        bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -w {output} -l {params.level} -t {params.threshold} -l {params.readlen}
     """
