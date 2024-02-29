@@ -17,3 +17,4 @@ From: continuumio/miniconda3
     conda env update -n root -f environment.yaml
     conda clean -afy
     pip install git+https://github.com/exels/MultiQC.git
+    exec /bin/bash
