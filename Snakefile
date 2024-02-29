@@ -165,9 +165,9 @@ rule kraken2:
         opts=config["kraken_options"].get("db","kraken_dbs")+"/opts.k2d",
         taxo=config["kraken_options"].get("db","kraken_dbs")+"/taxo.k2d"
     output:
-        krak = join(config["out_dir"], "classification_kraken/{sample}.kraken"),
-        krak_report = join(config["out_dir"], "classification_kraken/{sample}.kraken.report")
-    singularity: "docker://aangeloo/kraken2"
+        krak = join(config["out_dir"], "classification_kraken2/{sample}.kraken"),
+        krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kraken.report")
+    singularity: "docker://staphb/kraken2:2.1.3"
     shell:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names
