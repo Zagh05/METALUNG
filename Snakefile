@@ -98,7 +98,7 @@ rule download_kraken_database:
         add_genome=config["kraken_build_options"].get("add_genome",0),
         method=config["kraken_build_options"]["method"],
         references=config["kraken_build_options"]["references"]
-    container: "singularity.env"
+    container: "singularity_env.sif"
     shell:
         """
         bash ./scripts/download_kraken2_db.sh --method {params.db_root} --references {params.references} --output_dir {params.db_root}
@@ -146,7 +146,7 @@ rule index_centrifuge_db:
     params:
         threads=config["centrifuge_build_options"].get("threads","1"),
         reference_name=config["centrifuge_build_options"].get("reference_name","ex")
-    container: "singularity.env"
+    container: "singularity_env.sif"
     shell:
         """
         cat {input.fa_path}/*/*.fna |
@@ -167,7 +167,7 @@ rule kraken2:
     output:
         krak = join(config["out_dir"], "classification_kraken2/{sample}.kraken"),
         krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kraken.report")
-    container: "singularity.env"
+    container: "singularity_env.sif"
     shell:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names
@@ -185,7 +185,7 @@ rule centrifuge:
         kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kraken.report")
     params:
         threads=config["centrifuge_options"].get("threads",1)
-    container: "singularity.env"
+    container: "singularity_env.sif"
     shell:"""
     centrifuge -x {input.centrifuge_db} -S {output.stdout} --report-file {output.report_file} -f {input.fastq} 
     centrifuge-kreport -x {input.centrifuge_db} {output.report_file}  > {output.kraken_report}
@@ -204,7 +204,7 @@ rule bracken:
      threshold = config["bracken_options"].get("threshold",10),
      level = config["bracken_options"].get("taxonomic_level","S"),
      out = join(config["out_dir"],"classification_{classifier}/{sample}.bracken.report")
-    container: "singularity.env"
+    container: "singularity_env.sif"
     shell: """
        bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -w {output} -l {params.level} -t {params.threshold} -l {params.readlen}
     """
