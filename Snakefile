@@ -167,7 +167,7 @@ rule kraken2:
     output:
         krak = join(config["out_dir"], "classification_kraken2/{sample}.kraken"),
         krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kraken.report")
-    singularity: "docker://staphb/kraken2:2.1.3"
+    singularity: "Dockerfile"
     shell:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names

@@ -1,0 +1,10 @@
+name: metalung
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - fastqc
+  - nanofilt
+  - kraken2
+  - centrifuge
+  - bracken=2.6.0
