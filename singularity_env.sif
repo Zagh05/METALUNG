@@ -7,9 +7,6 @@ From: continuumio/miniconda3
 %environment
     PATH=/Bracken:$PATH
 
-%post
-    apt-get update --fix-missing
-
 %files
     environment.yaml
 
