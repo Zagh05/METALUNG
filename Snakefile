@@ -201,12 +201,12 @@ rule bracken:
     params:
      kraken_db = config["kraken_options"].get("db", "kraken_dbs"),
      readlen = config["bracken_options"]["read_length"],
-     threshold = config["bracken_options"].get("threshold",10),
+     threshold = config["bracken_options"].get("threshold",0),
      level = config["bracken_options"].get("taxonomic_level","S"),
      out = join(config["out_dir"],"classification_{classifier}/{sample}.bracken.report")
     #singularity: "singularity_env.sif"
     shell: """
-       bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -w {output} -l {params.level} -t {params.threshold} -l {params.readlen}
+       bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -w {output} -l {params.level} -t {params.threshold} -r {params.readlen}
     """
 
 
@@ -222,7 +222,7 @@ rule combine_kreport:
         config["out_dir"]+f"/classification_{classifier}/combined.kraken.report"
     shell:
         """
-        python combine_kreports.py -r {input} -o {output} --display-headers
+        python ./scripts/krakentools/combine_kreports.py -r {input} -o {output} --display-headers
         """
 
 rule kreport2krona:
@@ -232,7 +232,7 @@ rule kreport2krona:
         join(config["out_dir"],"krona_results/{sample}.krona")
     shell:
         """
-        python kreport2krona.py -r {input} -o {output}
+        python ./scripts/krakentools/kreport2krona.py -r {input} -o {output}
         """
 
 rule filter_bracken:
@@ -245,7 +245,7 @@ rule filter_bracken:
         list=config["filter_bracken"]["exclude"]
     shell:
         """
-        python filter_bracken_out.py -i {input} -o {output} --{params.to_} {params.list}
+        python ./scripts/krakentools/filter_bracken.out.py -i {input} -o {output} --{params.to_} {params.list}
         """
 
 rule make_biom:
