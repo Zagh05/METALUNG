@@ -222,7 +222,7 @@ rule combine_kreport:
         config["out_dir"]+f"/classification_{classifier}/combined.kraken.report"
     shell:
         """
-        python ./scripts/krakentools/combine_kreports.py -r {input} -o {output} --display-headers
+        python ./scripts/KrakenTools/combine_kreports.py -r {input} -o {output} --display-headers
         """
 
 rule kreport2krona:
@@ -232,7 +232,7 @@ rule kreport2krona:
         join(config["out_dir"],"krona_results/{sample}.krona")
     shell:
         """
-        python ./scripts/krakentools/kreport2krona.py -r {input} -o {output}
+        python ./scripts/KrakenTools/kreport2krona.py -r {input} -o {output}
         """
 
 rule filter_bracken:
@@ -245,7 +245,7 @@ rule filter_bracken:
         list=config["filter_bracken"]["exclude"]
     shell:
         """
-        python ./scripts/krakentools/filter_bracken.out.py -i {input} -o {output} --{params.to_} {params.list}
+        python ./scripts/KrakenTools/filter_bracken.out.py -i {input} -o {output} --{params.to_} {params.list}
         """
 
 rule make_biom:
