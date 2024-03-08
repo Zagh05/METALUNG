@@ -17,8 +17,8 @@ print(getwd())
 print(file.path("..",snakemake@input[["biom_file"]]))
 print(file.path("..",snakemake@input[["metadata"]]))
 print(file.path("..",snakemake@output[1]))
-metagenome <- import_biom(file.path("..",snakemake@input[["biom_file"]]))
-metadata <- read.csv(file.path("..",snakemake@input[["metadata"]]),sep=';',row.names = 1)
+metagenome <- import_biom(snakemake@input[["biom_file"]])
+metadata <- read.csv(snakemake@input[["metadata"]],sep=';',row.names = 1)
 metagenome@sam_data <- sample_data(metadata)
 
 # Change taxon names
@@ -28,4 +28,4 @@ colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order",
 metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
 
 #Save phyloseq object
-save(metagenome,file=file.path("..",snakemake@output))
+save(metagenome,file=snakemake@output[1])
