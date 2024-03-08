@@ -26,6 +26,6 @@ colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order",
 
 # Remove taxa which is not present in one sample at least
 metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
-
+output <- snakemake@output[1]
 #Save phyloseq object
-save(metagenome,file=snakemake@output[1])
+save(metagenome,file=output)
