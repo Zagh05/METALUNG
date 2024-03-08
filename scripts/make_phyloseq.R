@@ -15,7 +15,7 @@ suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 # Import biom file to a phyloseq object
 
 metagenome <- import_biom(snakemake@input[["biom_file"]])
-metadata <- read.csv(snakemake@input[["metadata"]],sep='\t')
+metadata <- read.csv(snakemake@input[["metadata"]],sep=';')
 metagenome@sam_data <- sample_data(metadata)
 
 # Change taxon names
