@@ -17,7 +17,7 @@ suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 print(file.path("..",snakemake@input[["biom_file"]]))
 print(file.path("..",snakemake@input[["metadata"]]))
 print(file.path("..",snakemake@output[1]))
-metagenome <- import_biom(file.path(".."+snakemake@input[["biom_file"]]))
+metagenome <- import_biom(file.path("..",snakemake@input[["biom_file"]]))
 metadata <- read.csv(file.path("..",snakemake@input[["metadata"]]),sep=';')
 metagenome@sam_data <- sample_data(metadata)
 
