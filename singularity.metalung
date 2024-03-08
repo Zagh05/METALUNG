@@ -13,7 +13,7 @@ From: continuumio/miniconda3
     echo "./opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
 
     apt-get install -y libcurl3-dev gcc zlib1g-dev
-    conda install -y -c conda-forge -c r -c bioconda r r-devtools r-ggplot2 r-ggpubr r-rcolorbrewer r-patchwork r-vegan r-plyr r-ALDEx2 r-cmapR
+    conda install -y -c conda-forge -c r -c bioconda r-devtools r-ggplot2 r-ggpubr r-rcolorbrewer r-patchwork r-vegan r-plyr r-ALDEx2 r-cmapR r-phyloseq r-dpylr
 
 
     # install some other packages

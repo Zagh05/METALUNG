@@ -6,15 +6,15 @@ threads: 4
 
 
 kraken_options:
-  db: "db_shotgun"
+  db: "db_shotgun" #Directory of indexed reference database
   threads: 8
   confidence: 0.1
 
-bracken_options:
-  run_bracken: True
-  read_length:
+bracken_options: #Running bracken will use the indexed database referenced in "kraken_options"
+  run_bracken: TRUE #Whether to run bracken or not
+  read_length:     # the read length of your data: e.g., if you are using 1500 bp reads, set it to 1500
   threshold: 10
-  level: "S"
+  level: "S"    #Estimate relative abundance at a given taxa level
 
 
 kraken_build_options:
@@ -35,15 +35,19 @@ centrifuge_options:
   threads:
 
 quality:
-  perform: True
-  threshold: 2
-  head_crop:
-  tail_crop:
-  min_length: 800
-  max_length: 1900
+  perform: TRUE   #TRUE/FALSE
+  threshold: 2  #Filter on a minimum average read quality score
+  head_crop:   #Trim n nucleotides from start of read
+  tail_crop:   #Trim n nucleotides from end of read
+  min_length: 800  #Filter on a minimum read length
+  max_length: 1900  #Filter on a maximum read length
 
-run_align: True
-host_reference: "./human_genome_reference/GCA_000001405.15_GRCh38_genomic.fna"
+
+## Align to reference host genome to eliminate host contamination reads
+
+
+run_align: TRUE #TRUE/FALSE whether to perform alignment or not
+host_reference: "./human_genome_reference/GCA_000001405.15_GRCh38_genomic.fna" #Path to host genome fa file
 
 minimap2_options:
    threads: 8
@@ -52,12 +56,19 @@ filter_bracken:
    filter: "include" # in ["include", "exclude"]
    exclude:        # List of tax ids to include or exclude
 
+
+# Downstream Analysis
+
+## Diversity analysis
+
+### Perform alpha diversity
 alpha_diversity:
   measures: ["Observed", "Chao1", "Shannon", "Simpson"] # Can select only the wanted measures
   title: "Alpha Diversity"
   color:
   shape:
 
+### Perform beta diversity
 beta_diversity:
   method:           # in ["DCA", "CCA", "RDA", "CAP", DPCoA", "NMDS", "PCoA"]
   distance:       # in ["bray", ..]
@@ -67,6 +78,8 @@ beta_diversity:
   type: "taxa"            # in ["taxa", "samples", "biplot", "split"]
   wrap:               # Group samples by categorical factor in the metadata table. Only one categorical factor possible.
 
+## Taxonomic barplots
+
 taxonomic_barplots:
   title:
   groups:               # Group samples by categorical factor in the metadata table. Can be a list of different groupments ==> pdf file
@@ -74,10 +87,12 @@ taxonomic_barplots:
   abundance: "relative"   # in ["absolut", "relative"]
   abundance_threshold:  0 # in percentage if relative and in counts if absolut !
 
+## Estimate differential abundance
 diff_abund:
   subset:
   group:
 
+## Abundance Heatmap
 abund_heatmap:
   subset:
   method:

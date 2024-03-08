@@ -211,9 +211,6 @@ rule bracken:
 
 
 
-
-
-
 #Downstream analysis with R
 rule combine_kreport:
     input:
@@ -263,7 +260,7 @@ rule make_phyloseq:
     input:
        biom_file=join(config["out_dir"],"analysis/{type}_table.biom")
     output:
-        join(config["out_dir"],"analysis/phyloseq_{type}.Rdata")
+        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/make_phyloseq.R'
