@@ -14,6 +14,9 @@ suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 
 # Import biom file to a phyloseq object
 
+print(snakemake@input[["biom_file"]])
+print(snakemake@input[["metadata"]])
+print(snakemake@output)
 metagenome <- import_biom(snakemake@input[["biom_file"]])
 metadata <- read.csv(snakemake@input[["metadata"]],sep=';')
 metagenome@sam_data <- sample_data(metadata)
