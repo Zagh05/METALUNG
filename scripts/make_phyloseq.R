@@ -17,8 +17,8 @@ suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 print(snakemake@input[["biom_file"]])
 print(snakemake@input[["metadata"]])
 print(snakemake@output[1])
-metagenome <- import_biom(snakemake@input[["biom_file"]])
-metadata <- read.csv(snakemake@input[["metadata"]],sep=';')
+metagenome <- import_biom(file.path(".."+snakemake@input[["biom_file"]]))
+metadata <- read.csv(file.path("..",snakemake@input[["metadata"]]),sep=';')
 metagenome@sam_data <- sample_data(metadata)
 
 # Change taxon names
@@ -28,4 +28,4 @@ colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order",
 metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
 
 #Save phyloseq object
-save(metagenome,file=snakemake@output[1])
+save(metagenome,file=file.path("..",snakemake@output))
