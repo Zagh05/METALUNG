@@ -1,15 +1,15 @@
 
 
 
-library("phyloseq")
-library("ggplot2")
-library("RColorBrewer")
-library("patchwork")
-library("vegan")
-library("tidyverse")
-library("readr")
-library("dyplr")
-library("tibble")
+suppressMessages(library("phyloseq",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("ggplot2",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("RColorBrewer",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("patchwork",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("vegan",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("tidyverse",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("readr",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("dplyr",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 
 
 # Import biom file to a phyloseq object
