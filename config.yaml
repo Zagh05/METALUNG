@@ -1,4 +1,5 @@
 input_dir: "wgs_vaginal_swab"
+metadata: "wgs_vaginal_swab/metadata_file.txt"
 out_dir: "test1_kraken_results"
 classifier: "kraken2" # in ["kraken2", "centrifuge"]
 mode: "ont"

@@ -259,11 +259,13 @@ rule make_biom:
 rule make_phyloseq:
     input:
        biom_file=join(config["out_dir"],"analysis/{type}_table.biom"),
+       metadata=config["metadata"]
     output:
         join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata"),
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/make_phyloseq.R'
+
 
 rule alpha_diversity:
     input:
