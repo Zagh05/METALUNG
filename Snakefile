@@ -261,7 +261,7 @@ rule make_phyloseq:
        biom_file=join(config["out_dir"],"analysis/{type}_table.biom"),
        metadata=config["metadata"]
     output:
-        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata"),
+        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.RData"),
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/make_phyloseq.R'
