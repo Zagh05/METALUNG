@@ -14,18 +14,16 @@ suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 
 # Import biom file to a phyloseq object
 print(getwd())
-print(file.path("..",snakemake@input[["biom_file"]]))
-print(file.path("..",snakemake@input[["metadata"]]))
-print(file.path("..",snakemake@output[1]))
 metagenome <- import_biom(snakemake@input[["biom_file"]])
 metadata <- read.csv(snakemake@input[["metadata"]],sep=';',row.names = 1)
 metagenome@sam_data <- sample_data(metadata)
 print(colnames(metagenome@otu_table@.Data))
+print(metagenome@sam_data)
 # Change taxon names
 colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
 # Remove taxa which is not present in one sample at least
 metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
-output <- snakemake@output[1]
+output <- snakemake@output
 #Save phyloseq object
 save(metagenome,file=output)
