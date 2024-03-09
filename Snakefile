@@ -247,9 +247,9 @@ rule filter_bracken:
 
 rule make_biom:
     output:
-        join(config["out_dir"],f"analysis/{type}_table.biom")
+        join(config["out_dir"],f"analysis/classification_table.biom")
     input:
-        expand(config["out_dir"]+f"/classification_{classifier}"+"/{sample}."+f"{type}.report",sample=SAMPLES.sample, classifier=classifier)
+        expand(config["out_dir"]+f"/classification_{classifier}"+"/{sample}."+f"kreport",sample=SAMPLES.sample, classifier=classifier)
 
     shell:
         """
@@ -258,10 +258,10 @@ rule make_biom:
 
 rule make_phyloseq:
     input:
-       biom_file=join(config["out_dir"],"analysis/{type}_table.biom"),
+       biom_file=join(config["out_dir"],"analysis/classification_table.biom"),
        metadata=config["metadata"]
     output:
-        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.RData"),
+        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData"),
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/make_phyloseq.R'
@@ -269,9 +269,9 @@ rule make_phyloseq:
 
 rule alpha_diversity:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
     output:
-        join(config["out_dir"], "analysis/alpha_diversity_{type}.png")
+        join(config["out_dir"], "analysis/alpha_diversity.png")
     params:
         measures = config["alpha_diversity"]["measures"],
         title = config["alpha_diversity"]["title"],
@@ -282,9 +282,9 @@ rule alpha_diversity:
 
 rule beta_diversity:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
     output:
-        join(config["out_dir"], "analysis/beta_diversity_{type}.png")
+        join(config["out_dir"], "analysis/beta_diversity.png")
     params:
         method = config["beta_diversity"]["method"],
         title = config["beta_diversity"]["title"],
@@ -300,9 +300,9 @@ rule beta_diversity:
 
 rule taxonomic_barplots:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
     output:
-        join(config["out_dir"],"analysis/taxonomic_barplots_{type}.pdf")
+        join(config["out_dir"],"analysis/taxonomic_barplots.pdf")
     params:
         title = config["taxonomic_barplots"]["title"],
         groups = config["taxonomic_barplots"]["groups"],
@@ -315,9 +315,9 @@ rule taxonomic_barplots:
 
 rule abund_heatmap:
     input:
-        phylo_obj=join(config["out_dir"], f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"], f"classification_{classifier}"+"/phyloseq_object.RData")
     output:
-        join(config["out_dir"],"analysis/abund_heatmap_{type}.png")
+        join(config["out_dir"],"analysis/abund_heatmap.png")
     params:
         subset  =   config["abund_heatmap"]["subset"],
         method =   config["abund_heatmap"]["method"],
@@ -331,9 +331,9 @@ rule abund_heatmap:
 
 rule differential_abundance:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_{type}.Rdata")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
     output:
-        join(config["out_dir"],"analysis/differential_abundance/"+"compositional_PCA_plot_{type}.pdf")
+        join(config["out_dir"],"analysis/differential_abundance/"+"compositional_PCA_plot.pdf")
 
     params:
         subset = config["diff_abund"].get("subset",0),
