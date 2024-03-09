@@ -16,7 +16,7 @@ groups = snakemake@params[["groups"]]
 abundance = snakemake@params[["abundance"]]
 output <- unlist(snakemake@output)
 
-metagenome <- load(phylo_obj)
+load(phylo_obj)
 
 bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
 

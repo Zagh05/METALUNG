@@ -19,7 +19,7 @@ taxa_label <- snakemake@params[["taxa_label"]]
 wrap <- snakemake@params[["wrap"]]
 output <- unlist(snakemake@output)
 
-metagenome <- load(phylo_obj)
+load(phylo_obj)
 
 bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
 
