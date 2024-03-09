@@ -253,7 +253,7 @@ rule make_biom:
 
     shell:
         """
-        kraken-biom {input} -o {output}
+        kraken-biom {input} -o {output} --fmt hdf5
         """
 
 rule make_phyloseq:
