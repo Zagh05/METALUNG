@@ -249,7 +249,7 @@ rule make_biom:
     output:
         join(config["out_dir"],f"analysis/classification_table.biom")
     input:
-        expand(config["out_dir"]+f"/classification_{classifier}"+"/{sample}."+f"kraken",sample=SAMPLES.sample, classifier=classifier)
+        expand(config["out_dir"]+f"/classification_{classifier}"+"/{sample}."+f"kreport",sample=SAMPLES.sample, classifier=classifier)
 
     shell:
         """
