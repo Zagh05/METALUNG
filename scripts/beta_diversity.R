@@ -17,7 +17,7 @@ shape <- snakemake@params[["shape"]]
 title <- snakemake@params[["title"]]
 type <- snakemake@params[["type"]]
 wrap <- snakemake@params[["wrap"]]
-
+output <- unlist(snakemake@output)
 
 metagenome <- load(phylo_obj)
 
@@ -28,7 +28,7 @@ bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 /
 bacteria_meta_perc.ord <- ordinate(physeq = bacteria_percentages, method = method, distance=distance)
 
 
-png("")
+png(output)
 
 if !(wrap){
     plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape)

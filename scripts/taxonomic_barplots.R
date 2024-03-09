@@ -14,6 +14,7 @@ tax_ranks = snakemake@params[["tax_ranks"]]
 abund_thres = snakemake@params[["abundance_threshold"]]
 groups = snakemake@params[["groups"]]
 abundance = snakemake@params[["abundance"]]
+output <- unlist(snakemake@output)
 
 metagenome <- load(phylo_obj)
 

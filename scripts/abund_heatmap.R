@@ -17,6 +17,7 @@ distance <- snakemake@params[["distance"]]
 sample_label <- snakemake@params[["sample_label"]]
 taxa_label <- snakemake@params[["taxa_label"]]
 wrap <- snakemake@params[["wrap"]]
+output <- unlist(snakemake@output)
 
 metagenome <- load(phylo_obj)
 
@@ -26,7 +27,7 @@ bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 /
 
 bacteria_subset <- subset_taxa(bacteria_meta_perc, subset)
 
-png("")
+png(output)
 
 if !(wrap){
     plot_heatmap(bacteria_subset, method = method, distance = distance, sample.label = sample_label, taxa.label = taxa_label, title = title)

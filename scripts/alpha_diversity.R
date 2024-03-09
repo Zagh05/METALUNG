@@ -14,7 +14,7 @@ measures <- snakemake@params[["measures"]]
 title <- snakemake@params[["title"]]
 color <- snakemake@params[["color"]]
 shape <- snakemake@params[["shape"]]
-output <- snakemake@output
+output <- unlist(snakemake@output)
 
 metagenome <- load(unlist(phylo_obj))
 
