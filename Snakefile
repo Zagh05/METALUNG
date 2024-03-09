@@ -26,9 +26,9 @@ type="kraken"
 
 rule all:
     input:
-         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.report",sample=SAMPLES.sample,classifier=classifier),
+         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
          expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
-         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
+         #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
          #expand("/filtered_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["quality"]["perform"] else "run.txt",
          #expand("/aligned_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["run_align"] else "run.txt"
 
@@ -166,7 +166,7 @@ rule kraken2:
         taxo=config["kraken_options"].get("db","kraken_dbs")+"/taxo.k2d"
     output:
         krak = join(config["out_dir"], "classification_kraken2/{sample}.kraken"),
-        krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kraken.report")
+        krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kreport")
     #singularity: "singularity_env.sif"
     shell:
         """
@@ -182,7 +182,7 @@ rule centrifuge:
     output:
         report_file=join(config["out_dir"], "classification_centrifuge/{sample}.report"),
         stdout=join(config["out_dir"], "classification_centrifuge/{sample}.centrifuge"),
-        kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kraken.report")
+        kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kreport")
     params:
         threads=config["centrifuge_options"].get("threads",1)
     #singularity: "singularity_env.sif"
@@ -194,7 +194,7 @@ rule centrifuge:
 
 rule bracken:
     input:
-     krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kraken.report"),
+     krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kreport"),
      krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken")
     output:
      join(config["out_dir"], "classification_{classifier}/{sample}.kraken.bracken_{level}.report")
@@ -214,9 +214,9 @@ rule bracken:
 #Downstream analysis with R
 rule combine_kreport:
     input:
-        expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.report",sample=SAMPLES.sample,classifier=classifier)
+        expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier)
     output:
-        config["out_dir"]+f"/classification_{classifier}/combined.kraken.report"
+        config["out_dir"]+f"/classification_{classifier}/combined.kreport"
     shell:
         """
         python ./scripts/KrakenTools/combine_kreports.py -r {input} -o {output} --display-headers
@@ -224,7 +224,7 @@ rule combine_kreport:
 
 rule kreport2krona:
     input:
-        config["out_dir"]+f"/classification_{classifier}"+"/{sample}.kraken.report"
+        config["out_dir"]+f"/classification_{classifier}"+"/{sample}.kreport"
     output:
         join(config["out_dir"],"krona_results/{sample}.krona")
     shell:
