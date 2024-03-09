@@ -17,7 +17,7 @@ shape <- snakemake@params[["shape"]]
 output <- unlist(snakemake@output)
 
 load(unlist(phylo_obj))
-
+print(metagenome)
 bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
 
 bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 / sum(x))
