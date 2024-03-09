@@ -20,7 +20,7 @@ print(file.path("..",snakemake@output[1]))
 metagenome <- import_biom(snakemake@input[["biom_file"]])
 metadata <- read.csv(snakemake@input[["metadata"]],sep=';',row.names = 1)
 metagenome@sam_data <- sample_data(metadata)
-
+print(colnames(metagenome@tax_table@.Data))
 # Change taxon names
 colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
