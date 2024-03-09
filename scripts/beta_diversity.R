@@ -9,7 +9,7 @@ suppressMessages(library("dplyr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("plyr", quietly = TRUE, warn.conflicts = FALSE))
 
-phylo_obj <- snakemake@input
+phylo_obj <- unlist(snakemake@input)
 method <- snakemake@params[["method"]]
 distance <- snakemake@params[["distance"]]
 color <- snakemake@params[["color"]]

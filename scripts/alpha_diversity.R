@@ -16,7 +16,7 @@ color <- snakemake@params[["color"]]
 shape <- snakemake@params[["shape"]]
 output <- snakemake@output
 
-metagenome <- load(phylo_obj)
+metagenome <- load(unlist(phylo_obj))
 
 bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
 

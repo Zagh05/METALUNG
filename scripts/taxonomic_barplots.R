@@ -9,7 +9,7 @@ suppressMessages(library("dplyr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("plyr", quietly = TRUE, warn.conflicts = FALSE))
 
-phylo_obj <- snakemake@input
+phylo_obj <- unlist(snakemake@input)
 tax_ranks = snakemake@params[["tax_ranks"]]
 abund_thres = snakemake@params[["abundance_threshold"]]
 groups = snakemake@params[["groups"]]
