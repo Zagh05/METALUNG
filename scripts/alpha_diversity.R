@@ -6,7 +6,7 @@ suppressMessages(library("patchwork",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("vegan",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("tidyverse",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("readr",quietly = TRUE, warn.conflicts = FALSE))
-suppressMessages(library("dyplr",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("dplyr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 
 phylo_obj <- snakemake@input
