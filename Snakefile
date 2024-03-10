@@ -314,10 +314,29 @@ rule taxonomic_barplots:
         abundance = config["taxonomic_barplots"]["abundance"],
         abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"],
         lineage = config["taxonomic_barplots"]["lineage"],
-        rank = config["taxonomic_barplots"]["rank"]
+        rank = config["taxonomic_barplots"]["rank"],
+        label = config["taxonomic_barplots"].get("label","")
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/taxonomic_barplots.R'
+
+rule lineage_barplots:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"],"analysis/lineage_barplots.pdf")
+    params:
+        title = config["lineage_barplots"]["title"],
+        groups = config["lineage_barplots"]["groups"],
+        abundance = config["lineage_barplots"]["abundance"],
+        abundance_threshold = config["lineage_barplots"]["abundance_threshold"],
+        lineage = config["lineage_barplots"]["lineage"],
+        rank = config["lineage_barplots"]["rank"],
+        analysis_rank = config["lineage_barplots"]["analysis_rank"],
+        label = config["lineage_barplots"].get("label","")
+#singularity: "docker://Zagh05/MetaLung:metalung"
+script:
+    'scripts/taxonomic_barplots.R'
 
 rule abund_heatmap:
     input:

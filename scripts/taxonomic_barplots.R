@@ -12,11 +12,12 @@ suppressMessages(library("plyr", quietly = TRUE, warn.conflicts = FALSE))
 phylo_obj <- unlist(snakemake@input[["phylo_obj"]])
 lineage <- snakemake@params[["lineage"]]
 rank <- snakemake@params[["rank"]]
-tax_ranks = snakemake@params[["tax_ranks"]]
-abund_thres = snakemake@params[["abundance_threshold"]]
-groups = snakemake@params[["groups"]]
-abundance = snakemake@params[["abundance"]]
+tax_ranks <- snakemake@params[["tax_ranks"]]
+abund_thres <- snakemake@params[["abundance_threshold"]]
+groups <-  snakemake@params[["groups"]]
+abundance <- snakemake@params[["abundance"]]
 output <- unlist(snakemake@output)
+label <- snakemake@params[["label"]]
 
 metagenome <- readRDS(phylo_obj)
 

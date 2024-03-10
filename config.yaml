@@ -88,8 +88,18 @@ taxonomic_barplots:
   tax_ranks:            # List of tax levels on which to do the analysis (One pdf file per tax level)
   abundance: "relative"   # in ["absolut", "relative"]
   abundance_threshold:  0 # in percentage if relative and in counts if absolut !
+  label:
+
+lineage_barplots:
+  groups:
+  analysis_rank:
   lineage:        # If you want to explore a given lineage thouroughly
   rank:         # The rank of the lineage you want to explore !!!
+  abundance:    # in ["absolut", "relative"]
+  abundance_threshold: 0    # in percentage if relative and in counts if absolut !
+  label:
+
+
 ## Estimate differential abundance
 diff_abund:
   subset:
