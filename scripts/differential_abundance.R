@@ -22,7 +22,7 @@ source("CoDaSeq_functions.R")
 
 
 
-phylo_obj <- unlist(snakemake@input)
+phylo_obj <- unlist(snakemake@input[["phylo_obj"]])
 subset <- snakemake@params[["subset"]]
 group <- snakemake@params[["group"]]
 output_dir <- snakemake@params[["output_dir"]]
