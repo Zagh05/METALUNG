@@ -14,6 +14,7 @@ measures <- snakemake@params[["measures"]]
 title <- snakemake@params[["title"]]
 color <- snakemake@params[["color"]]
 shape <- snakemake@params[["shape"]]
+xaxis_label <- snakemake@params[["xaxis_label"]]
 output <- unlist(snakemake@output)
 
 
@@ -24,7 +25,8 @@ bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
 bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 / sum(x))
 
 
-png(output)
+png(filename=output, width=1024, height=768)
+
 plot_richness(physeq=bacteria_meta, measures=measures, title=title, color=color)
 
 dev.off()

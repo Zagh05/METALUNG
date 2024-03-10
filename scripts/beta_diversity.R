@@ -25,18 +25,21 @@ bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
 
 bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 / sum(x))
 
-bacteria_meta_perc.ord <- ordinate(physeq = bacteria_percentages, method = method, distance=distance)
+bacteria_meta_perc.ord <- ordinate(physeq = bacteria_meta_perc, method = method, distance=distance)
 
 
-png(output)
+png(filename=output, width=1024, height=768)
 
-if !(wrap){
-    plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape)
+if (wrap==""){
+    plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape)+
+            geom_text(mapping = aes(label = label), size = 3, vjust = 1.5)
 
 }
 else {
     plot_ordination(bacteria_meta_perc, bacteria_meta_perc.ord, type=type, color=color, title=title, shape=shape) +
-            facet_wrap(~wrap,scales="free_x")
+            facet_wrap(wrap,scales="free_x")+
+            geom_text(mapping = aes(label = label), size = 3, vjust = 1.5)
+
 }
 
 

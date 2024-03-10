@@ -68,17 +68,18 @@ alpha_diversity:
   title: "Alpha Diversity"
   color:
   shape:
+  xaxis_label:
 
 ### Perform beta diversity
 beta_diversity:
   method:           # in ["DCA", "CCA", "RDA", "CAP", DPCoA", "NMDS", "PCoA"]
-  distance:       # in ["bray", ..]
+  distance:       # in ["bray", "uunifrac", "wunifrac", "jaccard", "minkowski"]
   color:
   shape:
-  title: # "Beta Diversity"
-  type: "taxa"            # in ["taxa", "samples", "biplot", "split"]
+  title: "Beta Diversity"
+  type: "taxa"            # in ["samples", "sites", "species", "taxa", "biplot", "split", "scree"]
   wrap:               # Group samples by categorical factor in the metadata table. Only one categorical factor possible.
-
+  label:              # Column name from metadata to map to text labels on the plot
 ## Taxonomic barplots
 
 taxonomic_barplots:
@@ -87,7 +88,8 @@ taxonomic_barplots:
   tax_ranks:            # List of tax levels on which to do the analysis (One pdf file per tax level)
   abundance: "relative"   # in ["absolut", "relative"]
   abundance_threshold:  0 # in percentage if relative and in counts if absolut !
-
+  lineage:        # If you want to explore a given lineage thouroughly
+  rank:         # The rank of the lineage you want to explore !!!
 ## Estimate differential abundance
 diff_abund:
   subset:

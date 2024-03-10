@@ -275,7 +275,8 @@ rule alpha_diversity:
     params:
         measures = config["alpha_diversity"]["measures"],
         title = config["alpha_diversity"]["title"],
-        color = config["alpha_diversity"]["color"]
+        color = config["alpha_diversity"]["color"],
+        xaxis_label = config["alpha_diversity"]["xaxis_label"]
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/alpha_diversity.R'
@@ -287,11 +288,14 @@ rule beta_diversity:
         join(config["out_dir"], "analysis/beta_diversity.png")
     params:
         method = config["beta_diversity"]["method"],
+        distance = config["beta_diversity"]["distance"],
         title = config["beta_diversity"]["title"],
-        color = config["beta_diversity"].get("color","NA"),
-        shape = config["beta_diversity"].get("shape","NA"),
+        color = config["beta_diversity"].get("color",""),
+        shape = config["beta_diversity"].get("shape",""),
         type = config["beta_diversity"]["type"],
-        wrap = config["beta_diversity"].get("wrap","NA")
+        wrap = config["beta_diversity"].get("wrap",""),
+        label = config["beta_diversity"].get("label","")
+
 
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
@@ -308,7 +312,9 @@ rule taxonomic_barplots:
         groups = config["taxonomic_barplots"]["groups"],
         tax_ranks = config["taxonomic_barplots"]["tax_ranks"],
         abundance = config["taxonomic_barplots"]["abundance"],
-        abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"]
+        abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"],
+        lineage = config["taxonomic_barplots"]["lineage"],
+        rank = config["taxonomic_barplots"]["rank"]
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/taxonomic_barplots.R'
