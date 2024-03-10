@@ -23,6 +23,10 @@ colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order",
 
 # Remove taxa which is not present in one sample at least
 metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
+
+# Rename taxa
+metagenome@tax_table <- substring(metagenome@tax_table,4)
+
 output <- snakemake@output
 #Save phyloseq object
 saveRDS(metagenome,file=unlist(output),compress=FALSE)
