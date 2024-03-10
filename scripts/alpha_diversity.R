@@ -25,6 +25,6 @@ bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 /
 
 
 png(output)
-plot_richness(physeq=bacteria_meta_perc, measures=measures, title=title, color=color)
+plot_richness(physeq=bacteria_meta, measures=measures, title=title, color=color)
 
 dev.off()
