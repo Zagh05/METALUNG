@@ -16,6 +16,7 @@ color <- snakemake@params[["color"]]
 shape <- snakemake@params[["shape"]]
 output <- unlist(snakemake@output)
 
+print(unlist(phylo_obj))
 metagenome <- readRDS(unlist(phylo_obj))
 print(metagenome)
 bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
