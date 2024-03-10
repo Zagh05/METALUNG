@@ -261,7 +261,7 @@ rule make_phyloseq:
        biom_file=join(config["out_dir"],"analysis/classification_table.biom"),
        metadata=config["metadata"]
     output:
-        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData"),
+        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds"),
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/make_phyloseq.R'
@@ -269,7 +269,7 @@ rule make_phyloseq:
 
 rule alpha_diversity:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
     output:
         join(config["out_dir"], "analysis/alpha_diversity.png")
     params:
@@ -282,7 +282,7 @@ rule alpha_diversity:
 
 rule beta_diversity:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
     output:
         join(config["out_dir"], "analysis/beta_diversity.png")
     params:
@@ -300,7 +300,7 @@ rule beta_diversity:
 
 rule taxonomic_barplots:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
     output:
         join(config["out_dir"],"analysis/taxonomic_barplots.pdf")
     params:
@@ -315,7 +315,7 @@ rule taxonomic_barplots:
 
 rule abund_heatmap:
     input:
-        phylo_obj=join(config["out_dir"], f"classification_{classifier}"+"/phyloseq_object.RData")
+        phylo_obj=join(config["out_dir"], f"classification_{classifier}"+"/phyloseq_object.rds")
     output:
         join(config["out_dir"],"analysis/abund_heatmap.png")
     params:
@@ -331,7 +331,7 @@ rule abund_heatmap:
 
 rule differential_abundance:
     input:
-        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.RData")
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
     output:
         join(config["out_dir"],"analysis/differential_abundance/"+"compositional_PCA_plot.pdf")
 

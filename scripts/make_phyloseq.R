@@ -25,4 +25,4 @@ colnames(metagenome@tax_table@.Data) <- c("Kingdom", "Phylum", "Class", "Order",
 metagenome <- prune_taxa(taxa_sums(metagenome)>0,metagenome)
 output <- snakemake@output
 #Save phyloseq object
-save(metagenome,file=unlist(output))
+saveRDS(metagenome,file=unlist(output))

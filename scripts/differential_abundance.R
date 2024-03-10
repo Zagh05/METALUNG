@@ -28,7 +28,7 @@ group <- snakemake@params[["group"]]
 output_dir <- snakemake@params[["output_dir"]]
 
 #Load phyloseq object saved in results' directory
-load(phylo_obj)
+metagenome <- readRDS(phylo_obj)
 
 
 #Use data only on bacteria ?
