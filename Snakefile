@@ -361,8 +361,10 @@ rule differential_abundance:
         join(config["out_dir"],"analysis/differential_abundance/"+"compositional_PCA_plot.pdf")
 
     params:
-        subset = config["diff_abund"].get("subset",0),
-        group = config["diff_abund"]["group"],
+        subset = config["diff_abund"].get("subset",""),
+        groups = config["diff_abund"]["groups"],
+        lineage = config["diff_abund"].get("lineage",""),
+        lineage_rank = config["diff_abund"].get("rank",""),
         output_dir = join(config["out_dir"],"differential_abundance")
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:

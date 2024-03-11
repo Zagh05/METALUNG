@@ -1,5 +1,5 @@
 input_dir: "wgs_vaginal_swab"
-metadata: "wgs_vaginal_swab/metadata_file.txt"
+metadata: "wgs_vaginal_swab/metadata_file.txt"  #Metadata on samples
 out_dir: "test1_kraken_results"
 classifier: "kraken2" # in ["kraken2", "centrifuge"]
 mode: "ont"
@@ -91,19 +91,31 @@ taxonomic_barplots:
   label:
 
 lineage_barplots:
-  groups:
-  analysis_rank:
+  groups:       # Group samples by categorical factor in the metadata table
+  analysis_rank:  # Tax level on which to do the analysis
   lineage:        # If you want to explore a given lineage thouroughly
   rank:         # The rank of the lineage you want to explore !!!
   abundance:    # in ["absolut", "relative"]
   abundance_threshold: 0    # in percentage if relative and in counts if absolut !
-  label:
+  label:                # if you want to label the samples in the x-axis
 
 
 ## Estimate differential abundance
 diff_abund:
+  ### To specify taxonomic levels for analysis (can be a list e.g ["Family","Genus","Species"]
   subset:
-  group:
+  ### To specify on which group feature to estimate differential abundance (can be list e.g ["Status", "Treatment"] and must be a 2-groups feature
+  groups:
+  ### If you want to estimate differential abundance for a particular lineage
+  lineage:      # e.g "Lactobacillus"
+  rank:         #Rank of the lineage chosen e.g "Genus"
+  # Filtering for compositional data analysis
+  ## Keep only samples with > min_reads (default 5000)
+  #min_reads: 5000
+  ## Keep only OTUs with relative abundance > abundance_threshold (default 0.1%)
+  #abundance_threshold: 0.1
+  ## Keep OTUs that are found in at least otu_cutoff fraction of samples (default is 30%)
+  #otu_cutoff: 30
 
 ## Abundance Heatmap
 abund_heatmap:
