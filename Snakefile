@@ -335,8 +335,8 @@ rule lineage_barplots:
         analysis_rank = config["lineage_barplots"]["analysis_rank"],
         label = config["lineage_barplots"].get("label","")
 #singularity: "docker://Zagh05/MetaLung:metalung"
-script:
-    'scripts/taxonomic_barplots.R'
+    script:
+        'scripts/lineage_barplots.R'
 
 rule abund_heatmap:
     input:
