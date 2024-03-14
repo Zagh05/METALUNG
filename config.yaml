@@ -89,6 +89,8 @@ taxonomic_barplots:
   abundance: "relative"   # in ["absolut", "relative"]
   abundance_threshold:  0 # in percentage if relative and in counts if absolut !
   label:
+  lineage:
+  rank:
 
 lineage_barplots:
   groups:       # Group samples by categorical factor in the metadata table
