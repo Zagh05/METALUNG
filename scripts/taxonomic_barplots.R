@@ -18,6 +18,7 @@ groups <-  snakemake@params[["groups"]]
 abundance <- snakemake@params[["abundance"]]
 output <- unlist(snakemake@output)
 label <- snakemake@params[["label"]]
+top_taxa <- snakemake@params[["top_taxa"]]
 
 metagenome <- readRDS(phylo_obj)
 
@@ -45,6 +46,14 @@ for (tax in tax_ranks) {
     bacteria_glom <- tax_glom(bacteria_meta_perc, taxrank=tax)
     }
 
+if (top_taxa!=0){
+
+    f1 <- filterfun_sample(topk(top_taxa))
+    wh1 <- genefilter_sample(bacteria_glom,f1,A=2)
+
+}
+
+
 # Melt phyloseq object into a dataframe to manipulate them with packages like ggplot2 and vegan
 
     bacteria_glom_df <- psmelt(bacteria_glom)
@@ -65,8 +74,8 @@ for (tax in tax_ranks) {
         scale_fill_manual(values = colors)+
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
         labs(title = paste("Taxonomy barplot on",tax,"level"), fill=tax)+
-        facet_wrap(g, scales="free_x")+
-      geom_text(mapping = aes(label = label), size = 3, vjust = 1.5)
+        facet_wrap(g, scales="free_x")#+
+      #geom_text(mapping = aes(label = label), size = 3, vjust = 1.5)
 
 
 

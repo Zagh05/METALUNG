@@ -80,6 +80,8 @@ beta_diversity:
   type: "taxa"            # in ["samples", "sites", "species", "taxa", "biplot", "split", "scree"]
   wrap:               # Group samples by categorical factor in the metadata table. Only one categorical factor possible.
   label:              # Column name from metadata to map to text labels on the plot
+
+
 ## Taxonomic barplots
 
 taxonomic_barplots:
@@ -91,6 +93,7 @@ taxonomic_barplots:
   label:
   lineage:
   rank:
+  top_taxa:
 
 lineage_barplots:
   groups:       # Group samples by categorical factor in the metadata table
@@ -101,6 +104,7 @@ lineage_barplots:
   abundance_threshold: 0    # in percentage if relative and in counts if absolut !
   label:                # if you want to label the samples in the x-axis
   title:
+  top_taxa:
 
 
 ## Estimate differential abundance

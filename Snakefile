@@ -26,8 +26,10 @@ type="kraken"
 
 rule all:
     input:
+         expand("in_dir"+"/filtered/{sample}.fastq",sample=SAMPLES.sample) if config["quality"]["perform"] else "",
          expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
-         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
+
+         #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
          #expand("/filtered_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["quality"]["perform"] else "run.txt",
          #expand("/aligned_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["run_align"] else "run.txt"
@@ -46,28 +48,39 @@ rule multiqc:
 
 
 # Rule: Quality filtering with NanoFilt
+
+
+
 rule quality_filter:
     input:
         in_dir+"/{sample}.fastq"
     output:
-        directory("/filtered_"+in_dir+"/{sample}.fastq")
+        "/filtered_"+in_dir+"/{sample}.fastq"
     params:
         quality_threshold=config["quality"].get("threshold",0),
         headcrop=config["quality"].get("head_crop",0),
         tailcrop=config["quality"].get("tail_crop",0),
-        max_length=config["quality"].get("max_length",0)
-    run:
-       shell_cmd = "NanoFilt"	
-       if params.quality_threshold:
-            shell_cmd += " -q {params.quality_threshold}"
-       if params.headcrop:
-            shell_cmd += " --headcrop {params.headcrop}"
-       if params.tailcrop:
-            shell_cmd += " --tailcrop {params.tailcrop}"
-       if params.max_length:
-           shell_cmd += " --maxlength {params.max_length}"
-       shell_cmd += " {input} > {output}; ln -s {in_dir} {output}"
-       shell(shell_cmd)
+        max_length=config["quality"].get("max_length",1700),
+        min_length=config["quality"].get("min_length",1200)
+    #run:
+    #   shell_cmd = "NanoFilt"
+    #   if params.quality_threshold:
+    #        shell_cmd += " -q {params.quality_threshold}"
+    #   if params.headcrop:
+    #        shell_cmd += " --headcrop {params.headcrop}"
+    #   if params.tailcrop:
+    #        shell_cmd += " --tailcrop {params.tailcrop}"
+    #   if params.max_length:
+    #       shell_cmd += " --maxlength {params.max_length}"
+    #   shell_cmd += " {input} > {output}; ln -s {in_dir} {output}"
+    #   shell(shell_cmd)
+    shell:
+        """
+        NanoFilt -q {params.quality_threshold} --headcrop {params.headcrop} --tailcrop {params.tailcrop} --maxlength {params.max_length} -l {params.min_length} {input} > {output}
+        
+        ln -s {in_dir} {output} 
+        
+        """
 
 
 # Rule: Align to human reference and exclude human reads + we filter resulting SAM file creating BAM file containing only the reads that did not align
@@ -134,9 +147,9 @@ rule download_kraken_database:
 
 rule index_centrifuge_db:
     output:
-        ex1 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".1.cf"),
-        ex2 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".2.cf"),
-        ex3 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".3.cf")
+        ex1 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]+".1.cf"),
+        ex2 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]+".2.cf"),
+        ex3 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]+".3.cf")
 
     input:
         conv=config["centrifuge_build_options"]["centrifuge_db"]+"/seqid2taxid.map",
@@ -175,16 +188,16 @@ rule kraken2:
 rule centrifuge:
     input:
         fastq=in_dir+"/{sample}.fastq",
-        centrifuge_db=join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]),
-        ex1 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".1.cf"),
-        ex2 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".2.cf"),
-        ex3 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"],".3.cf"),
+        ex1 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]+".1.cf"),
+        ex2 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]+".2.cf"),
+        ex3 = join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"]+".3.cf"),
     output:
         report_file=join(config["out_dir"], "classification_centrifuge/{sample}.report"),
         stdout=join(config["out_dir"], "classification_centrifuge/{sample}.centrifuge"),
         kraken_report=join(config["out_dir"],"classification_centrifuge/{sample}.kreport")
     params:
-        threads=config["centrifuge_options"].get("threads",1)
+        threads=config["centrifuge_options"].get("threads",1),
+        centrifuge_db=join(config["centrifuge_build_options"]["centrifuge_db"],config["centrifuge_build_options"]["reference_name"])
     #singularity: "singularity_env.sif"
     shell:"""
     centrifuge -x {input.centrifuge_db} -S {output.stdout} --report-file {output.report_file} -f {input.fastq} 
@@ -315,7 +328,8 @@ rule taxonomic_barplots:
         abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"],
         lineage = config["taxonomic_barplots"]["lineage"],
         rank = config["taxonomic_barplots"]["rank"],
-        label = config["taxonomic_barplots"].get("label","")
+        label = config["taxonomic_barplots"].get("label",""),
+        top_taxa = config["taxonomic_barplots"].get("top_taxa",0)
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/taxonomic_barplots.R'
@@ -333,7 +347,8 @@ rule lineage_barplots:
         lineage = config["lineage_barplots"]["lineage"],
         rank = config["lineage_barplots"]["rank"],
         analysis_rank = config["lineage_barplots"]["analysis_rank"],
-        label = config["lineage_barplots"].get("label","")
+        label = config["lineage_barplots"].get("label",""),
+        top_taxa = config["taxonomic_barplots"].get("top_taxa",0)
 #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/lineage_barplots.R'

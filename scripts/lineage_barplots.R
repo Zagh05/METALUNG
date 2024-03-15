@@ -18,6 +18,7 @@ groups <- snakemake@params[["groups"]]
 abundance <- snakemake@params[["abundance"]]
 output <- unlist(snakemake@output)
 label <- snakemake@params[["label"]]
+top_taxa <- snakemake@params[["top_taxa"]]
 
 metagenome <- readRDS(phylo_obj)
 
@@ -34,6 +35,13 @@ if (abundance=="absolut"){
 }
 else {
     bacteria_glom <- tax_glom(bacteria_meta_perc, taxrank=analysis_rank)
+}
+
+if (top_taxa!=0){
+
+    f1 <- filterfun_sample(topk(top_taxa))
+    wh1 <- genefilter_sample(bacteria_glom,f1,A=2)
+
 }
 
 # Melt phyloseq object into a dataframe to manipulate them with packages like ggplot2 and vegan
