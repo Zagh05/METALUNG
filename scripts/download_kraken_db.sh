@@ -29,7 +29,7 @@ done
 
 # Select the appropriate method
 
-if [ ${method} == "target" ]; then
+if [ "$method" == "target" ]; then
 
   if [ "$references" == "greengenes" ]; then
       link=${16s_greengenes}
@@ -44,7 +44,7 @@ if [ ${method} == "target" ]; then
     echo "Invalid reference argument. Please specify either 'greengenes' or 'rdp' or silva"
     exit 1
   fi
-elif [ ${method} == "shotgun" ]; then
+elif [ "$method" == "shotgun" ]; then
   kraken2-build --download-taxnomy --db ${output-dir}
   kraken2-build --download-library ${references} --db ${output-dir}
   kraken2-build --build --db ${output-dir}
