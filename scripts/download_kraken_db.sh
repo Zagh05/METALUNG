@@ -10,16 +10,16 @@
 for i in "$@"
 do
 case $i in
-    --method=*)
-    method="${i#*=}"
+    --method)
+    method="$i"
     shift
     ;;
-    --references=*)
-    references="${i#*=}"
+    --references)
+    references="$i"
     shift
     ;;
-    --output-dir=*)
-    output-dir="${i#*=}"
+    --output-dir)
+    output-dir="$i"
     shift
     ;;
     *)
