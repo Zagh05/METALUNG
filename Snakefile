@@ -53,9 +53,9 @@ rule multiqc:
 
 rule quality_filter:
     input:
-        {in_dir}+"/{sample}.fastq"
+        join(in_dir,"{sample}.fastq")
     output:
-        "/filtered_"+{in_dir}+"/{sample}.fastq"
+        join(config["out_dir"],"filtered_input/{sample}.fastq")
     params:
         quality_threshold=config["quality"].get("threshold",0),
         headcrop=config["quality"].get("head_crop",0),
@@ -87,16 +87,18 @@ rule quality_filter:
 # to the human genome reference
 rule align_to_host:
     input:
-        fastq={in_dir}+"/{sample}.fastq",
+        fastq=join(in_dir,"{sample}.fastq"),
         host_reference=config.get("host_reference")
     output:
-        join(config["out_dir"],"/aligned_input/{sample}.fastq")
+        join(config["out_dir"],"aligned_input/{sample}.fastq")
+    params:
+        out_dir=join(config["out_dir"],"aligned_input")
     shell:
         """
         if [ -n "{input[host_reference]}" ]; then
             minimap2 -ax map-ont {input[host_reference]} {input[fastq]} | 
-            samtools view -b -f 4 - > /aligned_{in_dir}/{wildcards.sample}_human_reads.bam && 
-            samtools fastq -f 12 -1 {output} /aligned_{in_dir}/{wildcards.sample}_human_reads.bam"""
+            samtools view -b -f 4 - > {params.out_dir}/{wildcards.sample}_human_reads.bam && 
+            samtools fastq -f 12 -1 {output} {params.out_dir}/{wildcards.sample}_human_reads.bam"""
         #ln -s {input[fastq]} {output}
          #   """
 
