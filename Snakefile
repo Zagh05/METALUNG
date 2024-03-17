@@ -78,10 +78,10 @@ rule quality_filter:
     shell:
         """
         NanoFilt -q {params.quality_threshold} --headcrop {params.headcrop} --tailcrop {params.tailcrop} --maxlength {params.max_length} -l {params.min_length} {input} > {output}
-        
-        ln -s {in_dir} {output} 
-        
         """
+        #ln -s {in_dir} {output}
+        
+
 
 
 # Rule: Align to human reference and exclude human reads + we filter resulting SAM file creating BAM file containing only the reads that did not align

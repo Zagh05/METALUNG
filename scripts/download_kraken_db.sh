@@ -18,8 +18,8 @@ case $i in
     references="${i#*=}"
     shift
     ;;
-    --output_dir=*)
-    output_dir="${i#*=}"
+    --output-dir=*)
+    output-dir="${i#*=}"
     shift
     ;;
     *)
@@ -29,25 +29,25 @@ done
 
 # Select the appropriate method
 
-if [ "$method" == "target" ]; then
+if [ ${method} == "target" ]; then
 
   if [ "$references" == "greengenes" ]; then
       link=${16s_greengenes}
-      wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
+      wget -O ${link} | gunzip | tar -xvf -C ${output-dir}
   elif [ "$references" == "silva" ]; then
       link=${16s_silva}
-      wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
+      wget -O ${link} | gunzip | tar -xvf -C ${output-dir}
   elif [ "$references" == "rdp" ]; then
       link=${16s_rdp}
-      wget -O ${link} | gunzip | tar -xvf -C ${output_dir}
+      wget -O ${link} | gunzip | tar -xvf -C ${output-dir}
   else
     echo "Invalid reference argument. Please specify either 'greengenes' or 'rdp' or silva"
     exit 1
   fi
-elif [ "$method" == "shotgun" ]; then
-  kraken2-build --download-taxnomy --db ${output_dir}
-  kraken2-build --download-library ${references} --db ${output_dir}
-  kraken2-build --build --db ${output_dir}
+elif [ ${method} == "shotgun" ]; then
+  kraken2-build --download-taxnomy --db ${output-dir}
+  kraken2-build --download-library ${references} --db ${output-dir}
+  kraken2-build --build --db ${output-dir}
 else
   echo "invalid method argument. Please specify either 'target' or 'shotgun'"
   exit 1
