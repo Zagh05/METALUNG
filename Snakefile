@@ -26,7 +26,7 @@ type="kraken"
 
 rule all:
     input:
-         expand("in_dir"+"/filtered/{sample}.fastq",sample=SAMPLES.sample) if config["quality"]["perform"] else "",
+         #expand("in_dir"+"/filtered/{sample}.fastq",sample=SAMPLES.sample) if config["quality"]["perform"] else "",
          expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
 
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
@@ -53,9 +53,9 @@ rule multiqc:
 
 rule quality_filter:
     input:
-        in_dir+"/{sample}.fastq"
+        {in_dir}+"/{sample}.fastq"
     output:
-        "/filtered_"+in_dir+"/{sample}.fastq"
+        "/filtered_"+{in_dir}+"/{sample}.fastq"
     params:
         quality_threshold=config["quality"].get("threshold",0),
         headcrop=config["quality"].get("head_crop",0),
@@ -87,10 +87,10 @@ rule quality_filter:
 # to the human genome reference
 rule align_to_host:
     input:
-        fastq=in_dir+"/{sample}.fastq",
+        fastq={in_dir}+"/{sample}.fastq",
         host_reference=config.get("host_reference")
     output:
-        "/aligned_"+in_dir+"/{sample}.fastq"
+        join(config["out_dir"],"/aligned_input/{sample}.fastq")
     shell:
         """
         if [ -n "{input[host_reference]}" ]; then
