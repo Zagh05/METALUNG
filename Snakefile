@@ -90,15 +90,15 @@ rule align_to_host:
         fastq=in_dir+"/{sample}.fastq",
         host_reference=config.get("host_reference")
     output:
-        directory("/aligned_"+in_dir+"/{sample}.fastq")
+        "/aligned_"+in_dir+"/{sample}.fastq"
     shell:
         """
         if [ -n "{input[host_reference]}" ]; then
             minimap2 -ax map-ont {input[host_reference]} {input[fastq]} | 
-            samtools view -b -f 4 - > {output}/{wildcards.sample}_human_reads.bam && 
-            samtools fastq -f 12 -1 {output}/{wildcards.sample}.fastq {output}/{wildcards.sample}_human_reads.bam
-            ln -s {input[fastq]} {output}/{wildcards.sample}.fastq
-            """
+            samtools view -b -f 4 - > /aligned_{in_dir}/{wildcards.sample}_human_reads.bam && 
+            samtools fastq -f 12 -1 {output} /aligned_{in_dir}/{wildcards.sample}_human_reads.bam"""
+        #ln -s {input[fastq]} {output}
+         #   """
 
 rule download_kraken_database:
     output:

@@ -9,11 +9,11 @@ threads: 4
 kraken_options:
   db: "db_shotgun" #Directory of indexed reference database
   threads: 8
-  confidence: 0.1
+  confidence: 0.3
 
 bracken_options: #Running bracken will use the indexed database referenced in "kraken_options"
   run_bracken: TRUE #Whether to run bracken or not
-  read_length:     # the read length of your data: e.g., if you are using 1500 bp reads, set it to 1500
+  read_length:    # the read length of your data: e.g., if you are using 1500 bp reads, set it to 1500
   threshold: 10
   level: "S"    #Estimate relative abundance at a given taxa level
 

@@ -30,11 +30,13 @@ bacteria_subset <- subset_taxa(bacteria_meta_perc, subset)
 png(output)
 
 if !(wrap){
-    plot_heatmap(bacteria_subset, method = method, distance = distance, sample.label = sample_label, taxa.label = taxa_label, title = title)
+    plot_heatmap(bacteria_subset, method = method, distance = distance, sample.label = sample_label, taxa.label = taxa_label, title = title)+
+    scale_fill_gradient(low = "blue", high = "red")
 
 }
 else {
     plot_heatmap(bacteria_subset, method = method, distance = distance, sample.label = sample_label, taxa.label = taxa_label, title = title) +
+    scale_fill_gradient(low = "blue", high = "red")+
             facet_wrap(~wrap,scales="free_x")
 }
 
