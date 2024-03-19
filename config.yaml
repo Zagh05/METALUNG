@@ -1,13 +1,13 @@
-input_dir: "wgs_vaginal_swab"
-metadata: "wgs_vaginal_swab/metadata_file.txt"  #Metadata on samples
-out_dir: "test1_kraken_results"
+input_dir: "16s_zymobiomics"
+metadata: "16s_zymobiomics/metadata_file.txt"  #Metadata on samples
+out_dir: "16s_zymobiomics_kraken_results"
 classifier: "kraken2" # in ["kraken2", "centrifuge"]
 mode: "ont"
 threads: 4
 
 
 kraken_options:
-  db: "db_shotgun" #Directory of indexed reference database
+  db: "db_gg" #Directory of indexed reference database
   threads: 8
   confidence: 0.3
 
