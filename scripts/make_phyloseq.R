@@ -10,11 +10,15 @@ suppressMessages(library("tidyverse",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("readr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("dplyr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
-
+source("alternative_import_biom.R")
 
 # Import biom file to a phyloseq object
-
+samples <- snakemake@SAMPLES
+if (length(samples)>1){
 metagenome <- import_biom(snakemake@input[["biom_file"]])
+} else {
+metagenome <- new_import_biom(snakemake@input[["biom_file"]])
+}
 metadata <- read.csv(snakemake@input[["metadata"]],sep=';',row.names = 1)
 metagenome@sam_data <- sample_data(metadata)
 

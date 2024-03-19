@@ -22,7 +22,7 @@ top_taxa <- snakemake@params[["top_taxa"]]
 
 metagenome <- readRDS(phylo_obj)
 
-bacteria_meta <- subset_taxa(metagenome, rank == lineage)  #must solve this problem ! !
+bacteria_meta <- subset_taxa(metagenome, rank == lineage)  #must solve this problem ! !  Family ="toto"  "Family"=="toto" *
 
 bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 / sum(x))
 
