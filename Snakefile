@@ -96,8 +96,8 @@ rule align_to_host:
     shell:
         """
         if [ -n "{input[host_reference]}" ]; then
-            minimap2 -ax map-ont {input[host_reference]} {input[fastq]} | 
-            samtools view -b -f 4 > {params.out_dir}/{wildcards.sample}_human_reads.bam 
+            minimap2 -ax map-ont {input[host_reference]} {input[fastq]} > {params.out_dir}/{wildcards.sample}_minimap2.bam
+            samtools view -b -f 4 {params.out_dir}/{wildcards.sample}_minimap2.bam > {params.out_dir}/{wildcards.sample}_human_reads.bam 
             samtools fastq {params.out_dir}/{wildcards.sample}_human_reads.bam > {output}
         fi
             """
