@@ -11,9 +11,7 @@ suppressMessages(library("readr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("dplyr",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("plyr",quietly = TRUE, warn.conflicts = FALSE))
-
-
-source('alternative_import_biom.R')
+source('./scripts/alternative_import_biom.R')
 
 # Import biom file to a phyloseq object
 samples <- snakemake@SAMPLES

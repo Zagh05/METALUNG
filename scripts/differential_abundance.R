@@ -21,7 +21,7 @@ suppressMessages(library("ALDEx2"), quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("zCompositions"), quietly=TRUE, warn.conflicts = FALSE))
 suppressMessages(library("compositions"), quietly=TRUE, warn.conflicts = FALSE))
 
-source("CoDaSeq_functions.R")
+source("./scripts/CoDaSeq_functions.R")
 
 
 
