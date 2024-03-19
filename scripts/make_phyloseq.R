@@ -14,7 +14,8 @@ suppressMessages(library("plyr",quietly = TRUE, warn.conflicts = FALSE))
 source('./scripts/alternative_import_biom.R')
 
 # Import biom file to a phyloseq object
-samples <- snakemake@SAMPLES
+samples <- snakemake@params[["samples"]]
+
 if (length(samples)>1){
 metagenome <- import_biom(snakemake@input[["biom_file"]])
 } else {

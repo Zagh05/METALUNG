@@ -281,6 +281,8 @@ rule make_phyloseq:
     output:
         join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds"),
     #singularity: "docker://Zagh05/MetaLung:metalung"
+    params:
+        samples=SAMPLES
     script:
         'scripts/make_phyloseq.R'
 
