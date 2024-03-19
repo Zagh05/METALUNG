@@ -63,22 +63,21 @@ rule quality_filter:
         tailcrop=config["quality"].get("tail_crop",0),
         max_length=config["quality"].get("max_length",1700),
         min_length=config["quality"].get("min_length",1200)
-    #run:
-    #   shell_cmd = "NanoFilt"
-    #   if params.quality_threshold:
-    #        shell_cmd += " -q {params.quality_threshold}"
-    #   if params.headcrop:
-    #        shell_cmd += " --headcrop {params.headcrop}"
-    #   if params.tailcrop:
-    #        shell_cmd += " --tailcrop {params.tailcrop}"
-    #   if params.max_length:
-    #       shell_cmd += " --maxlength {params.max_length}"
-    #   shell_cmd += " {input} > {output}; ln -s {in_dir} {output}"
-    #   shell(shell_cmd)
-    shell:
-        """
-        NanoFilt -q {params.quality_threshold} --headcrop {params.headcrop} --tailcrop {params.tailcrop} --maxlength {params.max_length} -l {params.min_length} {input} > {output}
-        """
+    run:
+       shell_cmd = "NanoFilt"
+       if params.quality_threshold is not None:
+            shell_cmd += " -q {params.quality_threshold}"
+       if params.headcrop is not None:
+            shell_cmd += " --headcrop {params.headcrop}"
+       if params.tailcrop is not None:
+            shell_cmd += " --tailcrop {params.tailcrop}"
+       if params.max_length is not None:
+           shell_cmd += " --maxlength {params.max_length}"
+       if params.min_length is not None:
+           shell_cmd += "--minlength {params.min_length}"
+       shell_cmd += " {input} > {output} " #; ln -s {in_dir} {output}"
+       shell(shell_cmd)
+    
         #ln -s {in_dir} {output}
         
 
