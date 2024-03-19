@@ -74,7 +74,7 @@ rule quality_filter:
        if params.max_length is not None:
            shell_cmd += " --maxlength {params.max_length} "
        if params.min_length is not None:
-           shell_cmd += "--minlength {params.min_length} "
+           shell_cmd += "--length {params.min_length} "
        shell_cmd += "{input} > {output} " #; ln -s {in_dir} {output}"
        shell(shell_cmd)
 
