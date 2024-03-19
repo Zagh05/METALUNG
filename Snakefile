@@ -28,7 +28,7 @@ rule all:
     input:
          #expand("in_dir"+"/filtered/{sample}.fastq",sample=SAMPLES.sample) if config["quality"]["perform"] else "",
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
-         expand(config["out_dir"]+"/filtered_input/{sample}.fastq",sample=SAMPLES.sample)
+         expand(config["out_dir"]+"/aligned_input/{sample}.fastq",sample=SAMPLES.sample)
 
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",

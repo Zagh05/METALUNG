@@ -1,6 +1,6 @@
-input_dir: "16s_vaginal_swab"
-metadata: "16s_vaginal_swab/metadata_file.txt"  #Metadata on samples
-out_dir: "16s_vaginal_kraken_results"
+input_dir: "wgs_vaginal_swab"
+metadata: "wgs_vaginal_swab/metadata_file.txt"  #Metadata on samples
+out_dir: "test1_kraken_results"
 classifier: "kraken2" # in ["kraken2", "centrifuge"]
 mode: "ont"
 threads: 4
