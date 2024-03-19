@@ -98,7 +98,7 @@ rule align_to_host:
         if [ -n "{input[host_reference]}" ]; then
             minimap2 -ax map-ont {input[host_reference]} {input[fastq]} | 
             samtools view -b -f 4 > {params.out_dir}/{wildcards.sample}_human_reads.bam 
-            samtools fastq -f 12 -1 {output} {params.out_dir}/{wildcards.sample}_human_reads.bam
+            samtools fastq -f 12 {params.out_dir}/{wildcards.sample}_human_reads.bam > {output}
         fi
             """
         #ln -s {input[fastq]} {output}
