@@ -1,6 +1,7 @@
 #https://github.com/ycl6
-
-
+suppressMessages(library("plyr",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("phyloseq",quietly = TRUE, warn.conflicts = FALSE))
+suppressMessages(library("biomformat",quietly = TRUE, warn.conflicts = FALSE))
 # Adapted from biomformat
 new_biom_data <- function(x, rows, columns, parallel=FALSE) {
   if(rlang::is_missing(rows)) {
