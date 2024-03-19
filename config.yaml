@@ -1,6 +1,6 @@
-input_dir: "16s_zymobiomics"
-metadata: "16s_zymobiomics/metadata_file.txt"  #Metadata on samples
-out_dir: "16s_zymobiomics_kraken_results"
+input_dir: "16s_vaginal_swab"
+metadata: "16s_vaginal_swab/metadata_file.txt"  #Metadata on samples
+out_dir: "16s_vaginal_kraken_results"
 classifier: "kraken2" # in ["kraken2", "centrifuge"]
 mode: "ont"
 threads: 4
@@ -40,8 +40,8 @@ quality:
   threshold: 2  #Filter on a minimum average read quality score
   head_crop:   #Trim n nucleotides from start of read
   tail_crop:   #Trim n nucleotides from end of read
-  min_length: 800  #Filter on a minimum read length
-  max_length: 1900  #Filter on a maximum read length
+  min_length: 1200  #Filter on a minimum read length
+  max_length: 1700  #Filter on a maximum read length
 
 
 ## Align to reference host genome to eliminate host contamination reads
