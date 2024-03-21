@@ -97,9 +97,11 @@ rule align_to_host:
         """
         if [ -n "{input[host_reference]}" ]; then
             minimap2 -a -x map-ont {input[host_reference]} {input[fastq]} > {params.out_dir}/{wildcards.sample}_minimap2.sam
-            samtools sort --write-index -o {params.out_dir}/{wildcards.sample}_human_reads.bam {params.out_dir}/{wildcards.sample}_minimap2.sam
-            samtools view -b -f 4 {params.out_dir}/{wildcards.sample}_human_reads.bam > {params.out_dir}/{wildcards.sample}_human_reads.bam 
-            samtools fastq {params.out_dir}/{wildcards.sample}_human_reads.bam > {output}
+            samtools sort -o {params.out_dir}/{wildcards.sample}_human_reads.bam {params.out_dir}/{wildcards.sample}_minimap2.sam
+            samtools view -b -f 4 {params.out_dir}/{wildcards.sample}_human_reads.bam > {params.out_dir}/{wildcards.sample}_human_reads_filter.bam 
+            samtools fastq {params.out_dir}/{wildcards.sample}_human_reads_filter.bam > {output}
+            rm *.bam
+            rm *.sam
         fi
             """
         #ln -s {input[fastq]} {output}
@@ -215,16 +217,25 @@ rule bracken:
      krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kreport"),
      krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken")
     output:
-     join(config["out_dir"], "classification_{classifier}/{sample}.kraken.bracken_{level}.report")
+     join(config["out_dir"], "classification_{classifier}/{sample}_bracken.kreport")
     params:
      kraken_db = config["kraken_options"].get("db", "kraken_dbs"),
      readlen = config["bracken_options"]["read_length"],
      threshold = config["bracken_options"].get("threshold",0),
      level = config["bracken_options"].get("taxonomic_level","S"),
-     out = join(config["out_dir"],"classification_{classifier}/{sample}.bracken.report")
+     out = join(config["out_dir"],"classification_{classifier}/{sample}.report"),
+     filter=config["bracken_options"].get("filter",0),
+     to_=config["filter_bracken"]["to"],
+     list=config["filter_bracken"]["exclude"]
+
     #singularity: "singularity_env.sif"
     shell: """
        bracken -d {params.kraken_db} -i {input.krak_report} -o {params.out} -w {output} -l {params.level} -t {params.threshold} -r {params.readlen}
+       if [ {params.filter} ]; then
+         python ./scripts/KrakenTools/filter_bracken.out.py -i {output} -o {output} --{params.to_} {params.list}
+        fi
+       mv {output} {input.krak_report}
+        
     """
 
 
@@ -250,18 +261,6 @@ rule kreport2krona:
         python ./scripts/KrakenTools/kreport2krona.py -r {input} -o {output}
         """
 
-rule filter_bracken:
-    input:
-        join(config["out_dir"], f"classification_{classifier}","/{sample}.bracken_{level}.report")
-    output:
-        join(config["out_dir"],"filtered_bracken/{sample}.bracken_{level}.report")
-    params:
-        to_=config["filter_bracken"]["filter"],
-        list=config["filter_bracken"]["exclude"]
-    shell:
-        """
-        python ./scripts/KrakenTools/filter_bracken.out.py -i {input} -o {output} --{params.to_} {params.list}
-        """
 
 rule make_biom:
     output:
@@ -314,7 +313,10 @@ rule beta_diversity:
         shape = config["beta_diversity"].get("shape",""),
         type = config["beta_diversity"]["type"],
         wrap = config["beta_diversity"].get("wrap",""),
-        label = config["beta_diversity"].get("label","")
+        label = config["beta_diversity"].get("label",""),
+        taxrank = config["beta_diversity"].get("taxrank",""),
+        subset = config["beta_diversity"].get("subset",""),
+        rank_subset = config["beta_diversity"].get("rank_subset","")
 
 
     #singularity: "docker://Zagh05/MetaLung:metalung"
@@ -333,8 +335,6 @@ rule taxonomic_barplots:
         tax_ranks = config["taxonomic_barplots"]["tax_ranks"],
         abundance = config["taxonomic_barplots"]["abundance"],
         abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"],
-        lineage = config["taxonomic_barplots"]["lineage"],
-        rank = config["taxonomic_barplots"]["rank"],
         label = config["taxonomic_barplots"].get("label",""),
         top_taxa = config["taxonomic_barplots"].get("top_taxa",0)
     #singularity: "docker://Zagh05/MetaLung:metalung"

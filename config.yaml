@@ -7,15 +7,19 @@ threads: 4
 
 
 kraken_options:
-  db: "db_gg" #Directory of indexed reference database
-  threads: 8
-  confidence: 0.3
+  db: "db_shotgun" #Directory of indexed reference database
+  threads: 28
+  confidence: 0.5
 
 bracken_options: #Running bracken will use the indexed database referenced in "kraken_options"
   run_bracken: TRUE #Whether to run bracken or not
   read_length:    # the read length of your data: e.g., if you are using 1500 bp reads, set it to 1500
   threshold: 10
   level: "S"    #Estimate relative abundance at a given taxa level
+  filter: TRUE
+  to: "exclude" # in ["include", "exclude"]
+  exclude: [ "9606" ]       # List of tax ids to include or exclude
+
 
 
 kraken_build_options:
@@ -51,11 +55,9 @@ run_align: TRUE #TRUE/FALSE whether to perform alignment or not
 host_reference: "./human_genome_reference/GCA_000001405.15_GRCh38_genomic.fna" #Path to host genome fa file
 
 minimap2_options:
-   threads: 8
+   threads: 28
 
-filter_bracken:
-   filter: "include" # in ["include", "exclude"]
-   exclude:        # List of tax ids to include or exclude
+
 
 
 # Downstream Analysis
@@ -80,6 +82,9 @@ beta_diversity:
   type: "taxa"            # in ["samples", "sites", "species", "taxa", "biplot", "split", "scree"]
   wrap:               # Group samples by categorical factor in the metadata table. Only one categorical factor possible.
   label:              # Column name from metadata to map to text labels on the plot
+  subset:
+  rank_subset:
+  taxrank:
 
 
 ## Taxonomic barplots

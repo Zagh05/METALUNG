@@ -10,8 +10,6 @@ suppressMessages(library("tibble",quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library("plyr", quietly = TRUE, warn.conflicts = FALSE))
 
 phylo_obj <- unlist(snakemake@input[["phylo_obj"]])
-lineage <- snakemake@params[["lineage"]]
-rank <- snakemake@params[["rank"]]
 tax_ranks <- snakemake@params[["tax_ranks"]]
 abund_thres <- snakemake@params[["abundance_threshold"]]
 groups <-  snakemake@params[["groups"]]
@@ -69,7 +67,7 @@ if (top_taxa!=0){
 
     colors <- colorRampPalette(brewer.pal(8,'Dark2'))(length(levels(bacteria_glom_df[[tax]])))
 
-    figure <- ggplot(data=bacteria_glom_df, aes(x=Sample, y=Abundance, fill=bacteria_glom_df[[tax]]))+
+    figure <- ggplot(data=bacteria_glom_df, aes(x=Sample, y=Abundance, fill=get(tax))+
         geom_bar(aes(), stat='identity', position='stack')+
         scale_fill_manual(values = colors)+
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +

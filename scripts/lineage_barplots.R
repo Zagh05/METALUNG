@@ -22,7 +22,7 @@ top_taxa <- snakemake@params[["top_taxa"]]
 
 metagenome <- readRDS(phylo_obj)
 
-bacteria_meta <- subset_taxa(metagenome, rank == lineage)  #must solve this problem ! !  Family ="toto"  "Family"=="toto" *
+bacteria_meta <- subset_taxa(metagenome, rank %in% lineage)  #must solve this problem ! !  Family ="toto"  "Family"=="toto" *
 
 bacteria_meta_perc <- transform_sample_counts(bacteria_meta, function(x) x*100 / sum(x))
 
@@ -55,11 +55,11 @@ bacteria_glom_df[[analysis_rank]] <- as.factor(bacteria_glom_df[[analysis_rank]]
 # brewer.pal() is a function from the RColorBrewer package that provides color palettes based on ColorBrewer designs.
 
 colors <- colorRampPalette(brewer.pal(8,'Dark2'))(length(levels(bacteria_glom_df[[analysis_rank]]
-figure <- ggplot(data=bacteria_glom_df, aes(x=Sample, y=Abundance, fill=bacteria_glom_df[[analysis_rank]]))+
+figure <- ggplot(data=bacteria_glom_df, aes(x=Sample, y=Abundance, fill=get(analysis_rank))+
     geom_bar(aes(), stat='identity', position='stack')+
     scale_fill_manual(values = colors)+
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-    labs(title = paste("Taxonomy barplot on",tax,"level","for lineage", lineage), fill=analysis_rank)+
+    labs(title = paste("Taxonomy barplot on",tax,"level","for lineage", lineage), fill=get(analysis_rank))+
     facet_wrap(groups, scales="free_x")
   #+geom_text(mapping = aes(label = label), size = 3, vjust = 1   have to check it !
 png(filename=output, width=1024, height=768)
