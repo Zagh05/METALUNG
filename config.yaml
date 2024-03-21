@@ -1,7 +1,7 @@
 input_dir: "wgs_vaginal_swab"
 metadata: "wgs_vaginal_swab/metadata_file.txt"  #Metadata on samples
 out_dir: "test1_kraken_results"
-classifier: "kraken2" # in ["kraken2", "centrifuge"]
+classifier: "bracken" # in ["kraken2", "centrifuge","bracken"]
 mode: "ont"
 threads: 4
 
@@ -11,9 +11,8 @@ kraken_options:
   threads: 28
   confidence: 0.5
 
-bracken_options: #Running bracken will use the indexed database referenced in "kraken_options"
-  run_bracken: TRUE #Whether to run bracken or not
-  read_length:    # the read length of your data: e.g., if you are using 1500 bp reads, set it to 1500
+bracken_options: #Running kraken2 then bracken when classifier set to "bracken", will use the indexed database referenced in "kraken_options"
+  read_length: 100 # the read length of your data: e.g., if you are using 1500 bp reads, set it to 1500
   threshold: 10
   level: "S"    #Estimate relative abundance at a given taxa level
   filter: TRUE

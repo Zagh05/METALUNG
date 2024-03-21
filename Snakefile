@@ -27,8 +27,11 @@ type="kraken"
 rule all:
     input:
          #expand("in_dir"+"/filtered/{sample}.fastq",sample=SAMPLES.sample) if config["quality"]["perform"] else "",
-         #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
-         expand(config["out_dir"]+"/aligned_input/{sample}.fastq",sample=SAMPLES.sample)
+         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
+         expand(config["out_dir"]+"/analysis/classification_table.biom"),
+         expand(config["out_dir"]+"/classification_{classifier}/phyloseq_object.rds",classifier=classifier)
+
+         #expand(config["out_dir"]+"/aligned_input/{sample}.fastq",sample=SAMPLES.sample)
 
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
          #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
@@ -192,6 +195,8 @@ rule kraken2:
         """
            time kraken2 --db {input[kraken_db]} --threads {config[threads]} --output {output.krak} --report {output.krak_report} {input.fastq} --use-names
         """
+
+
 rule centrifuge:
     input:
         fastq=in_dir+"/{sample}.fastq",
@@ -214,10 +219,10 @@ rule centrifuge:
 
 rule bracken:
     input:
-     krak_report = join(config["out_dir"], "classification_{classifier}/{sample}.kreport"),
-     krak = join(config["out_dir"], "classification_{classifier}/{sample}.kraken")
+     krak_report = join(config["out_dir"], "classification_kraken2/{sample}.kreport"),
+     krak = join(config["out_dir"], "classification_kraken2/{sample}.kraken")
     output:
-     join(config["out_dir"], "classification_{classifier}/{sample}_bracken.kreport")
+     join(config["out_dir"], "classification_{classifier}/{sample}.kreport")
     params:
      kraken_db = config["kraken_options"].get("db", "kraken_dbs"),
      readlen = config["bracken_options"]["read_length"],
@@ -225,8 +230,8 @@ rule bracken:
      level = config["bracken_options"].get("taxonomic_level","S"),
      out = join(config["out_dir"],"classification_{classifier}/{sample}.report"),
      filter=config["bracken_options"].get("filter",0),
-     to_=config["filter_bracken"]["to"],
-     list=config["filter_bracken"]["exclude"]
+     to_=config["bracken_options"]["to"],
+     list=config["bracken_options"]["exclude"]
 
     #singularity: "singularity_env.sif"
     shell: """
@@ -234,11 +239,18 @@ rule bracken:
        if [ {params.filter} ]; then
          python ./scripts/KrakenTools/filter_bracken.out.py -i {output} -o {output} --{params.to_} {params.list}
         fi
-       mv {output} {input.krak_report}
+    
         
     """
-
-
+#rule fix_bracken:
+#    input:
+#        join(config["out_dir"],"classification_{classifier}/{sample}_bracken.kreport")
+#    output:
+#        join(config["out_dir"], "classification_{classifier}/{sample}.kreport")
+#    shell:
+#        """
+#        mv {input} {output}
+#        """
 
 #Downstream analysis with R
 rule combine_kreport:
