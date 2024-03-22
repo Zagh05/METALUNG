@@ -120,14 +120,12 @@ diff_abund:
   ### If you want to estimate differential abundance for a particular lineage
   lineage:      # e.g "Lactobacillus"
   rank:         #Rank of the lineage chosen e.g "Genus"
-  # Filtering for compositional data analysis
-  ## Keep only samples with > min_reads (default 5000)
-  #min_reads: 5000
-  ## Keep only OTUs with relative abundance > abundance_threshold (default 0.1%)
-  #abundance_threshold: 0.1
-  ## Keep OTUs that are found in at least otu_cutoff fraction of samples (default is 30%)
-  #otu_cutoff: 30
-
+  top_taxa:
+  filter_by_sample:
+  bh_fdr_cutoff:    #Benjamini-Hochberg (B-H) false discovery rate corrected p-value cutoff
+  found:            #if "one", significance's condition on threshold whether with EB-Welch’s t test or EB-Wilcoxon test. If "all" then signficance necessary for both tests.
+  label_significant:
+  color_significant:
 ## Abundance Heatmap
 abund_heatmap:
   subset:

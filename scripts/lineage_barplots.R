@@ -45,7 +45,7 @@ if (top_taxa!=0){
 }
 
 # Melt phyloseq object into a dataframe to manipulate them with packages like ggplot2 and vegan
-
+bacteria_glom <- prune_taxa(wh1,bacteria_glom)
 bacteria_glom_df <- psmelt(bacteria_glom)
 str(bacteria_glom_df)
 bacteria_glom_df <- bacteria_glom_df[bacteria_glom_df$Abundance>abund_thres,]

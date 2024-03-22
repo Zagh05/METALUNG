@@ -27,16 +27,10 @@ type="kraken"
 rule all:
     input:
          #expand("in_dir"+"/filtered/{sample}.fastq",sample=SAMPLES.sample) if config["quality"]["perform"] else "",
-         expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier),
-         expand(config["out_dir"]+"/analysis/classification_table.biom"),
-         expand(config["out_dir"]+"/classification_{classifier}/phyloseq_object.rds",classifier=classifier)
+         join(config["out_dir"],"filtered_input/SRR14307912.fastq"),
+         join(config["out_dir"],"aligned_input/SRR14307912.fastq"),
+         config["out_dir"]+"/classification_"+config["classifier"]+"/SRR14307912.kreport",
 
-         #expand(config["out_dir"]+"/aligned_input/{sample}.fastq",sample=SAMPLES.sample)
-
-         #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken",sample=SAMPLES.sample,classifier=classifier),
-         #expand(config["out_dir"]+"/classification_{classifier}/{sample}.kraken.bracken_species.report",sample=SAMPLES.sample,classifier=classifier) if config["bracken_options"]["run_bracken"] else "run.txt",
-         #expand("/filtered_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["quality"]["perform"] else "run.txt",
-         #expand("/aligned_"+in_dir+"/{sample}.fastq", sample=SAMPLES.sample) if config["run_align"] else "run.txt"
 
 # Rule: Generate MultiQC report
 rule multiqc:
@@ -399,7 +393,13 @@ rule differential_abundance:
         groups = config["diff_abund"]["groups"],
         lineage = config["diff_abund"].get("lineage",""),
         lineage_rank = config["diff_abund"].get("rank",""),
-        output_dir = join(config["out_dir"],"differential_abundance")
+        output_dir = join(config["out_dir"],"differential_abundance"),
+        top_taxa = join(config["out_dir"],"top_taxa"),
+        filter_by_sample = join(config["out_dir"],"filter_by_sample"),
+        bh_fdr_cutoff = join(config["out_dir"],"bh_fdr_cutoff"),
+        found = join(config["out_dir"],"found"),
+        label_significant = join(config["out_dir"],"label_significant"),
+        color_significant = join(config["out_dir"],"color_significant")
     #singularity: "docker://Zagh05/MetaLung:metalung"
     script:
         'scripts/differential_abundance.R'

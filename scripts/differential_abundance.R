@@ -31,22 +31,29 @@ groups <- snakemake@params[["group"]]
 lineage <- snakemake@params[["lineage"]]
 lineage_rank <- snakemake@params[["lineage_rank"]]
 output_dir <- unlist(snakemake@params[["output_dir"]])
-
+top_taxa <- snakemake@params[["top_taxa"]]
+filter_by_sample <- snakemake@params[["filter_by_sample"]]
+bh_fdr_cutoff <- snakemake@params[["bh_fdr_cutoff"]]
+found <- snakemake@params[["found"]]
+label_significant <- snakemake@params[["label_significant"]]
+color_significant <- snakemake@params[["color_significant"]]
 #Load phyloseq object saved in results' directory
 metagenome <- readRDS(phylo_obj)
 
-
 #Use data only on bacteria ?
 bacteria_meta <- subset_taxa(metagenome, Kingdom=='Bacteria')
+
 sample_data <- bacteria_meta@sam_data
 
+taxon <- as.data.frame(bacteria_meta@tax_table@.Data)
+
 if (lineage!=""){
- bacteria_meta <- subset_taxa(bacteria_meta, lineage_rank == lineage)
+ bacteria_meta <- subset_taxa(bacteria_meta, get(lineage_rank) %in% lineage)
 }
 
 #To specify taxonomic levels for analysis (e.g., ‘kingdom’, ‘phylum’, ‘class’, etc.) if subset=="" then taxonomic levels from ‘kingdom’ down to ‘species’ are included
 
-if (length(unique(sample_data$group)) != 2){
+if (length(unique(sample_data$groups)) != 2){
     warning('Will not do ALDEx2 differential abundance with !=2 groups')}
 
 if (nrow(sample_data) < 3){
@@ -64,21 +71,76 @@ if (nrow(sample_data) < 3){
     for (tax.level in do.tax.levels[!(do.tax.levels %in% c('Kingdom'))]){
         print(paste('.....', tax.level))
         bacteria_level <- tax_glom(bacteria_meta, taxrank=tax.level)
-        #bacteria_level_norm <- transform_sample_counts(bacteria_level, function(x) x/sum(x))
-        #bacteria_level <- prune_taxa(taxa_sums(bacteria_meta_norm)>abundance_threshold, bacteria_meta_norm)
-        #bacteria_level <- prune_taxa(taxa_sums(bacteria_meta_norm > 0) / nsamples(bacteria_meta_norm) > otu_cutoff, bacteria_meta_norm)
+        toptax <- topk(toptaxa)
+        f1 <- filterfun_sample(toptax)
+        wh1 <- genefilter_sample(bacteria_level,f1,A=filter_by_sample)
+        bacteria_level <- prune_taxa(wh1,bacteria_level)
         mat <- bacteria_level@otu_table@.Data
         # convert to CLR
         x.all <- aldex(mat, conditions=sample_data[[group]], mc.samples=128, test="t", effect=TRUE, denom = 'all', verbose = F)
 
-        #Set up a 1x2 plot layout
-        par(mfrow=c(1,2))
+        found.by.one<-which(x.all$we.eBH<bh_fdr_cutoff|x.all$wi.eBH<bh_fdr_cutoff)
+        found.by.all<-which(x.all$we.eBH<bh_fdr_cutoff&x.all$wi.eBH<bh_fdr_cutoff)
 
-        aldex.plot(x.all, type="MA", test="welch", xlab="Log-ratio abundance", ylab="Difference")
-        aldex.plot(x.all, type="MW", test="welch", xlab="Dispersion",ylab="Difference")
+        if (found=="all"){
+            found <- found.by.all
+        } else if (found=="one"){
+            found <- found.by.one
+        }
+        species.found <- taxon[rownames(taxon)%in%rownames(x.all)[found],]$Species
+        genus.found <- taxon[rownames(taxon)%in%rownames(x.all)[found],]$Genus
 
-        #Add a main title
-        mtext(paste("Differential abundance on",tax.level,"level"), side=3,line=-2,outer=TRUE)
+        if (color_significant=="Genus"){
+            colors <- rainbow(length(unique(genus.found)))
+            names(colors) <- unique(genus.found)
+            colors_labels <- genus.found
+        } else if (color_significant=="Species"){
+             colors <- rainbow(length(unique(species.found)))
+             names(colors) <- unique(species.found)
+             colors_labels <- species.found
+        }
+
+        if (label_significant=="Genus"){
+            labels <- genus.found
+        } else if (label_significant=="Species"){
+            labels <- species.found
+        }
+
+         par(mfrow=c(1,1))
+
+         aldex.plot(x.all, type="MA", test="welch",cutoff.pval=bh_fdr_cutoff,called.cex=1,called.col="red")
+         text(x = x.all$rab.all[found],
+             y = x.all$diff.btw[found],
+             labels = labels,
+             pos = 3,
+             cex = 0.5,col = colors[colors_labels])
+         legend_colors <- colors
+         legend_labels <- names(colors)
+         title(main = sprintf("Bland Altman plot (q=%0.2f)",bh_fdr_cutoff))
+         legend("topright", legend = legend_labels, col = legend_colors, pch = 19, cex = 0.8)
+
+         aldex.plot(x.all, type="MW", test="welch", cutoff.pval=bh_fdr_cutoff,called.cex=1,called.col="red")
+         text(x = x.all$diff.win[found],
+             y = x.all$diff.btw[found],
+             labels = labels,
+             pos = 3,
+             cex = 0.5,col = colors[colors_labels])
+         legend_colors <- colors
+         legend_labels <- names(colors)
+         title(main = sprintf("Effect plot (q=%0.2f)",bh_fdr_cutoff))
+         legend("topright", legend = legend_labels, col = legend_colors, pch = 19, cex = 0.8)
+
+         aldex.plot(x.all, type="volcano", test="welch", cutoff.pval=bh_fdr_cutoff,called.cex=1,called.col="red")
+         text(x = x.all$diff.btw[found],
+             y = -1*median(log10(x.all$we.eBH[found])),
+             labels = labels,
+             pos = 3,
+             cex = 0.5,col = colors[colors_labels])
+         legend_colors <- colors
+         legend_labels <- names(colors)
+         title(main = sprintf("Volcano plot (q=%0.2f)",bh_fdr_cutoff))
+         legend("topright", legend = legend_labels, col = legend_colors, pch = 19, cex = 0.8)
+
         dev.off()
     }
 }

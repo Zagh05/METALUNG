@@ -1,0 +1,194 @@
+from os.path import join, exists
+import sys
+import snakemake
+import time
+
+
+# Import config
+# Load config file
+#if not config:
+ #   raise SystemExit(
+  #      "Config not found, are you sure your profile contains a path to an "
+   #     "existing configfile?"
+    #)
+
+#with open("config.yaml", "r") as config_file:
+#    config = yaml.safe_load(config_file)
+
+
+configfile: "config.yaml"
+in_dir=config["input_dir"]
+SAMPLES=glob_wildcards(in_dir+"/{sample}.fastq")
+classifier=config["classifier"]
+print(SAMPLES)
+type="kraken"
+
+rule all:
+    input:
+        join(config["out_dir"],"analysis/classification_table.biom"),
+        join(config["out_dir"],"classification_"+config["classifier"]+"/phyloseq_object.rds"),
+        join(config["out_dir"],"analysis/alpha_diversity.biom"),
+        join(config["out_dir"],"analysis/beta_diversity.biom"),
+        join(config["out_dir"],"analysis/taxonomic_barplots.pdf"),
+        join(config["out_dir"],"analysis/lineage_barplots.pdf"),
+        join(config["out_dir"],"analysis/abund_heatmap.png"),
+
+
+#Downstream analysis with R
+rule combine_kreport:
+    input:
+        expand(config["out_dir"]+"/classification_{classifier}/{sample}.kreport",sample=SAMPLES.sample,classifier=classifier)
+    output:
+        config["out_dir"]+f"/classification_{classifier}/combined.kreport"
+    shell:
+        """
+        python ./scripts/KrakenTools/combine_kreports.py -r {input} -o {output} --display-headers
+        """
+
+rule kreport2krona:
+    input:
+        config["out_dir"]+f"/classification_{classifier}"+"/{sample}.kreport"
+    output:
+        join(config["out_dir"],"krona_results/{sample}.krona")
+    shell:
+        """
+        python ./scripts/KrakenTools/kreport2krona.py -r {input} -o {output}
+        """
+
+
+rule make_biom:
+    output:
+        join(config["out_dir"],f"analysis/classification_table.biom")
+    input:
+        expand(config["out_dir"]+f"/classification_{classifier}"+"/{sample}."+f"kreport",sample=SAMPLES.sample, classifier=classifier)
+
+    shell:
+        """
+        kraken-biom {input} -o {output} --fmt json
+        """
+
+rule make_phyloseq:
+    input:
+       biom_file=join(config["out_dir"],"analysis/classification_table.biom"),
+       metadata=config["metadata"]
+    output:
+        join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds"),
+    #singularity: "docker://Zagh05/MetaLung:metalung"
+    params:
+        samples=SAMPLES
+    script:
+        'scripts/make_phyloseq.R'
+
+
+rule alpha_diversity:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"], "analysis/alpha_diversity.png")
+    params:
+        measures = config["alpha_diversity"]["measures"],
+        title = config["alpha_diversity"]["title"],
+        color = config["alpha_diversity"]["color"],
+        xaxis_label = config["alpha_diversity"]["xaxis_label"]
+    #singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/alpha_diversity.R'
+
+rule beta_diversity:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"], "analysis/beta_diversity.png")
+    params:
+        method = config["beta_diversity"]["method"],
+        distance = config["beta_diversity"]["distance"],
+        title = config["beta_diversity"]["title"],
+        color = config["beta_diversity"].get("color",""),
+        shape = config["beta_diversity"].get("shape",""),
+        type = config["beta_diversity"]["type"],
+        wrap = config["beta_diversity"].get("wrap",""),
+        label = config["beta_diversity"].get("label",""),
+        taxrank = config["beta_diversity"].get("taxrank",""),
+        subset = config["beta_diversity"].get("subset",""),
+        rank_subset = config["beta_diversity"].get("rank_subset","")
+
+
+    #singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/beta_diversity.R'
+
+
+rule taxonomic_barplots:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"],"analysis/taxonomic_barplots.pdf")
+    params:
+        title = config["taxonomic_barplots"]["title"],
+        groups = config["taxonomic_barplots"]["groups"],
+        tax_ranks = config["taxonomic_barplots"]["tax_ranks"],
+        abundance = config["taxonomic_barplots"]["abundance"],
+        abundance_threshold = config["taxonomic_barplots"]["abundance_threshold"],
+        label = config["taxonomic_barplots"].get("label",""),
+        top_taxa = config["taxonomic_barplots"].get("top_taxa",0)
+    #singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/taxonomic_barplots.R'
+
+rule lineage_barplots:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"],"analysis/lineage_barplots.pdf")
+    params:
+        title = config["lineage_barplots"]["title"],
+        groups = config["lineage_barplots"]["groups"],
+        abundance = config["lineage_barplots"]["abundance"],
+        abundance_threshold = config["lineage_barplots"]["abundance_threshold"],
+        lineage = config["lineage_barplots"]["lineage"],
+        rank = config["lineage_barplots"]["rank"],
+        analysis_rank = config["lineage_barplots"]["analysis_rank"],
+        label = config["lineage_barplots"].get("label",""),
+        top_taxa = config["taxonomic_barplots"].get("top_taxa",0)
+#singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/lineage_barplots.R'
+
+rule abund_heatmap:
+    input:
+        phylo_obj=join(config["out_dir"], f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"],"analysis/abund_heatmap.png")
+    params:
+        subset  =   config["abund_heatmap"]["subset"],
+        method =   config["abund_heatmap"]["method"],
+        distance =   config["abund_heatmap"]["distance"],
+        sample_label =  config["abund_heatmap"]["sample_label"],
+        taxa_label =   config["abund_heatmap"]["taxa_label"],
+        wrap =   config["abund_heatmap"].get("wrap",0)
+    #singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/abund_heatmap.R'
+
+rule differential_abundance:
+    input:
+        phylo_obj=join(config["out_dir"],f"classification_{classifier}"+"/phyloseq_object.rds")
+    output:
+        join(config["out_dir"],"analysis/differential_abundance/"+"compositional_PCA_plot.pdf")
+
+    params:
+        subset = config["diff_abund"].get("subset",""),
+        groups = config["diff_abund"]["groups"],
+        lineage = config["diff_abund"].get("lineage",""),
+        lineage_rank = config["diff_abund"].get("rank",""),
+        output_dir = join(config["out_dir"],"differential_abundance"),
+        top_taxa = join(config["out_dir"],"top_taxa"),
+        filter_by_sample = join(config["out_dir"],"filter_by_sample"),
+        bh_fdr_cutoff = join(config["out_dir"],"bh_fdr_cutoff"),
+        found = join(config["out_dir"],"found"),
+        label_significant = join(config["out_dir"],"label_significant"),
+        color_significant = join(config["out_dir"],"color_significant")
+    #singularity: "docker://Zagh05/MetaLung:metalung"
+    script:
+        'scripts/differential_abundance.R'
+
